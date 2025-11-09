@@ -11,6 +11,7 @@
 <body class="bg-gray-100 p-6">
 
     <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-4 md:p-6">
+
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3 md:gap-0">
             <h1 class="text-2xl font-bold">Dashboard Fasilitator</h1>
@@ -50,7 +51,18 @@
             </div>
         </div>
 
-        <!-- Pengaturan Kuota & Aksi -->
+        <!-- Modal Konfirmasi -->
+        <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden p-4">
+            <div class="bg-white p-6 rounded-lg text-center max-w-sm w-full">
+                <p id="confirmText" class="mb-4 text-gray-800 font-medium"></p>
+                <div class="flex gap-2 justify-center">
+                    <button id="confirmYes" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Ya</button>
+                    <button id="confirmNo" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Batal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kuota & Aksi -->
         <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 mb-6">
             <label class="font-medium flex-shrink-0">Kuota Kursi:</label>
             <input id="quotaInput" type="number" value="150" min="1"
@@ -76,10 +88,21 @@
 
         <p id="quotaInfo" class="text-gray-700 mb-4 text-sm"></p>
 
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="text-center py-6 hidden">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <p class="text-gray-500 mt-2">Memuat data peserta...</p>
+        </div>
+
         <!-- Tabel Peserta -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto max-h-[400px]">
             <table class="w-full border-collapse border text-xs sm:text-sm">
-                <thead class="bg-gray-200">
+                <thead class="bg-gray-200 sticky top-0 z-10">
                     <tr>
                         <th class="border px-2 py-2">#</th>
                         <th class="border px-2 py-2">Nama</th>
@@ -119,6 +142,10 @@
         const qrModal = document.getElementById('qrModal');
         const qrCanvas = document.getElementById('qrCanvas');
         const toggleOpenBtn = document.getElementById('toggleOpenBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmText = document.getElementById('confirmText');
+        let confirmCallback = null;
 
         // Cek login dan load data awal
         (async () => {
@@ -164,6 +191,21 @@
             link.click();
         });
 
+        // Modal konfirmasi
+        function showConfirm(message, callback) {
+            confirmText.textContent = message;
+            confirmModal.classList.remove('hidden');
+            confirmCallback = callback;
+        }
+        document.getElementById('confirmYes').addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            if (confirmCallback) confirmCallback(true);
+        });
+        document.getElementById('confirmNo').addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            if (confirmCallback) confirmCallback(false);
+        });
+
         // Open/Close Kuesioner
         async function loadOpenStatus() {
             try {
@@ -179,32 +221,35 @@
                 console.error(e);
             }
         }
-
-
         function updateOpenButton(status) {
             toggleOpenBtn.textContent = status == 1 ? 'Tutup Kuesioner' : 'Buka Kuesioner';
             toggleOpenBtn.dataset.status = status;
         }
-
-        toggleOpenBtn.addEventListener('click', async () => {
-            let newStatus = toggleOpenBtn.dataset.status == 1 ? 0 : 1;
-            try {
-                const res = await fetch('api/open_question.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ open: newStatus })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    updateOpenButton(newStatus);
-                    alert(data.message);
-                } else {
-                    alert(data.message || 'Gagal memperbarui status');
+        toggleOpenBtn.addEventListener('click', () => {
+            const newStatus = toggleOpenBtn.dataset.status == 1 ? 0 : 1;
+            showConfirm(
+                `Apakah Anda yakin ingin ${newStatus ? 'membuka' : 'menutup'} kuesioner?`,
+                async (confirmed) => {
+                    if (!confirmed) return;
+                    try {
+                        const res = await fetch('api/open_question.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ open: newStatus })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            updateOpenButton(newStatus);
+                            alert(data.message);
+                        } else {
+                            alert(data.message || 'Gagal memperbarui status');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert('Terjadi kesalahan saat menghubungi server.');
+                    }
                 }
-            } catch (e) {
-                console.error(e);
-                alert('Terjadi kesalahan saat menghubungi server.');
-            }
+            );
         });
 
         // Kuota
@@ -218,54 +263,61 @@
             document.getElementById('quotaInfo').textContent =
                 `Kuota kursi saat ini: ${q}. Peserta dengan ranking ≤ ${q} dan integritas LULUS akan berstatus LULUS.`;
         }
-        document.getElementById('saveQuota').addEventListener('click', async () => {
+        document.getElementById('saveQuota').addEventListener('click', () => {
             const newQuota = parseInt(document.getElementById('quotaInput').value);
-            const res = await fetch('api/update_quota.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quota: newQuota })
+            showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${newQuota}?`, async (confirmed) => {
+                if (!confirmed) return;
+                const res = await fetch('api/update_quota.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quota: newQuota })
+                });
+                const data = await res.json();
+                alert(`Kuota diperbarui menjadi ${data.quota}`);
+                await fetch('api/update_ranking.php');
+                await loadData();
             });
-            const data = await res.json();
-            alert(`Kuota diperbarui menjadi ${data.quota}`);
-            await fetch('api/update_ranking.php');
-            await loadData();
         });
 
-        document.getElementById('updateRanking').addEventListener('click', async () => {
-            await fetch('api/update_ranking.php');
-            await loadData();
+        document.getElementById('updateRanking').addEventListener('click', () => {
+            showConfirm('Apakah yakin ingin memperbarui ranking peserta?', async (confirmed) => {
+                if (!confirmed) return;
+                await fetch('api/update_ranking.php');
+                await loadData();
+            });
         });
 
         document.getElementById('filterStatus').addEventListener('change', e => {
             currentFilter = e.target.value;
             loadData(currentPage);
         });
-
         document.getElementById('limitSelect').addEventListener('change', e => {
             limit = parseInt(e.target.value);
             currentPage = 1;
             loadData(currentPage);
         });
-
         document.getElementById('downloadPassed').addEventListener('click', () => {
             window.location.href = 'api/export_selected.php';
         });
 
         // Load data peserta
         async function loadData(page = 1) {
+            loadingSpinner.classList.remove('hidden');
             const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
             const result = await res.json();
+            loadingSpinner.classList.add('hidden');
+
             const tbody = document.getElementById('dataTable');
+            const oldRows = Array.from(tbody.children);
             tbody.innerHTML = '';
 
             const filtered = result.data.filter(item =>
                 currentFilter === 'ALL' ? true : item.status === currentFilter
             );
 
-            filtered.forEach((item) => {
+            filtered.forEach((item, index) => {
                 const integrityColor = item.integrity_status === 'LULUS' ? 'text-green-600' : 'text-red-600';
                 const statusColor = item.status === 'LULUS' ? 'text-green-600 font-semibold' : 'text-gray-500';
-
                 const row = document.createElement('tr');
                 row.classList.add('text-center', 'border', 'hover:bg-gray-50');
                 row.innerHTML = `
@@ -279,6 +331,12 @@
                     <td class="border px-2 py-1">${item.ranking ?? '-'}</td>
                     <td class="border px-2 py-1 ${statusColor}">${item.status}</td>
                 `;
+                // Highlight baris baru / berubah
+                const oldRow = oldRows[index];
+                if (!oldRow || oldRow.innerHTML !== row.innerHTML) {
+                    row.classList.add('bg-yellow-100');
+                    setTimeout(() => row.classList.remove('bg-yellow-100'), 1500);
+                }
                 tbody.appendChild(row);
             });
 
