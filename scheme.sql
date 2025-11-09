@@ -13,15 +13,16 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS open_questions_schedule (
     id INT PRIMARY KEY AUTO_INCREMENT,
     start_time DATETIME DEFAULT NULL,
-    end_time DATETIME DEFAULT NULL,
+    end_time DATETIME DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS open_questions {
+CREATE TABLE IF NOT EXISTS open_questions (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    is_open BOOLEAN DEFAULT TRUE,
-};
+    is_open BOOLEAN DEFAULT TRUE
+);
 
 INSERT INTO open_questions (is_open) VALUES (TRUE);
+
 -- Tambahkan kolom 'organization' jika belum ada
 SET
     @org_exists := (
