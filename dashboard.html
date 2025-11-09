@@ -15,15 +15,15 @@
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">Dashboard Fasilitator</h1>
             <div class="flex items-center gap-3">
-                <!-- Tombol Share Kuesioner -->
                 <button id="shareLinkBtn" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
                     Bagikan Link Kuesioner
                 </button>
-                <!-- Tombol QR Code -->
                 <button id="qrBtn" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
                     Tampilkan QR
                 </button>
-                <!-- Logout -->
+                <button id="toggleOpenBtn" class="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700">
+                    Loading...
+                </button>
                 <button id="logoutBtn" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
                     Logout
                 </button>
@@ -36,7 +36,8 @@
                 <h2 class="text-lg font-bold mb-4">Scan QR untuk membuka kuesioner</h2>
                 <canvas id="qrCanvas" class="mx-auto mb-4"></canvas>
                 <div class="flex justify-center gap-2">
-                    <button id="downloadQrBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Download QR</button>
+                    <button id="downloadQrBtn"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Download QR</button>
                     <button id="closeQr" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Tutup</button>
                 </div>
             </div>
@@ -102,10 +103,13 @@
         let currentPage = 1;
         let limit = 20;
         let currentFilter = "ALL";
-        // Ambil domain saat ini agar tidak hardcode
         const questionnaireUrl = window.location.origin;
 
-        // Cek login
+        const qrModal = document.getElementById('qrModal');
+        const qrCanvas = document.getElementById('qrCanvas');
+        const toggleOpenBtn = document.getElementById('toggleOpenBtn');
+
+        // Cek login dan load data awal
         (async () => {
             const res = await fetch('api/check_auth.php');
             const data = await res.json();
@@ -114,6 +118,7 @@
             } else {
                 await loadQuota();
                 await loadData();
+                await loadOpenStatus();
             }
         })();
 
@@ -122,7 +127,7 @@
             window.location.href = 'api/logout.php';
         });
 
-        // Tombol share link dengan fallback
+        // Tombol share
         document.getElementById('shareLinkBtn').addEventListener('click', () => {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(questionnaireUrl)
@@ -134,19 +139,13 @@
         });
 
         // Tombol QR
-        const qrModal = document.getElementById('qrModal');
-        const qrCanvas = document.getElementById('qrCanvas');
         document.getElementById('qrBtn').addEventListener('click', () => {
             QRCode.toCanvas(qrCanvas, questionnaireUrl, { width: 200 }, function (error) {
                 if (error) console.error(error);
                 qrModal.classList.remove('hidden');
             });
         });
-        document.getElementById('closeQr').addEventListener('click', () => {
-            qrModal.classList.add('hidden');
-        });
-
-        // Tombol download QR
+        document.getElementById('closeQr').addEventListener('click', () => qrModal.classList.add('hidden'));
         document.getElementById('downloadQrBtn').addEventListener('click', () => {
             const link = document.createElement('a');
             link.href = qrCanvas.toDataURL("image/png");
@@ -154,20 +153,60 @@
             link.click();
         });
 
-        // Load kuota
+        // Open/Close Kuesioner
+        async function loadOpenStatus() {
+            try {
+                const res = await fetch('api/open_question.php', { method: 'GET' });
+                const data = await res.json();
+                if (data.success && typeof data.open_question !== 'undefined') {
+                    updateOpenButton(data.open_question);
+                } else {
+                    toggleOpenBtn.textContent = 'Tidak diketahui';
+                }
+            } catch (e) {
+                toggleOpenBtn.textContent = 'Error';
+                console.error(e);
+            }
+        }
+
+
+        function updateOpenButton(status) {
+            toggleOpenBtn.textContent = status == 1 ? 'Tutup Kuesioner' : 'Buka Kuesioner';
+            toggleOpenBtn.dataset.status = status;
+        }
+
+        toggleOpenBtn.addEventListener('click', async () => {
+            let newStatus = toggleOpenBtn.dataset.status == 1 ? 0 : 1;
+            try {
+                const res = await fetch('api/open_question.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ open: newStatus })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    updateOpenButton(newStatus);
+                    alert(data.message);
+                } else {
+                    alert(data.message || 'Gagal memperbarui status');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Terjadi kesalahan saat menghubungi server.');
+            }
+        });
+
+        // Kuota
         async function loadQuota() {
             const res = await fetch('api/get_quota.php');
             const data = await res.json();
             document.getElementById('quotaInput').value = data.quota;
             updateQuotaInfo(data.quota);
         }
-
         function updateQuotaInfo(q) {
             document.getElementById('quotaInfo').textContent =
                 `Kuota kursi saat ini: ${q}. Peserta dengan ranking ≤ ${q} dan integritas LULUS akan berstatus LULUS.`;
         }
-
-        // Simpan kuota
         document.getElementById('saveQuota').addEventListener('click', async () => {
             const newQuota = parseInt(document.getElementById('quotaInput').value);
             const res = await fetch('api/update_quota.php', {
@@ -181,31 +220,27 @@
             await loadData();
         });
 
-        // Update ranking manual
         document.getElementById('updateRanking').addEventListener('click', async () => {
             await fetch('api/update_ranking.php');
             await loadData();
         });
 
-        // Filter status
         document.getElementById('filterStatus').addEventListener('change', e => {
             currentFilter = e.target.value;
             loadData(currentPage);
         });
 
-        // Ganti jumlah baris per halaman
         document.getElementById('limitSelect').addEventListener('change', e => {
             limit = parseInt(e.target.value);
             currentPage = 1;
             loadData(currentPage);
         });
 
-        // Download CSV peserta LULUS
         document.getElementById('downloadPassed').addEventListener('click', () => {
             window.location.href = 'api/export_selected.php';
         });
 
-        // Load data peserta dengan pagination
+        // Load data peserta
         async function loadData(page = 1) {
             const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
             const result = await res.json();
@@ -252,17 +287,13 @@
             };
 
             container.appendChild(createBtn('Prev', page - 1, page <= 1));
-
             const range = 2;
             const start = Math.max(1, page - range);
             const end = Math.min(totalPages, page + range);
-
             for (let i = start; i <= end; i++) {
                 container.appendChild(createBtn(i, i, false, i === page));
             }
-
             container.appendChild(createBtn('Next', page + 1, page >= totalPages));
-
             currentPage = page;
         }
     </script>
