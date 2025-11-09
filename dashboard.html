@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Fasilitator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Dashboard Fasilitator</h1>
+            <button id="logoutBtn" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                Logout
+            </button>
+        </div>
+
+        <!-- Pengaturan Kuota & Aksi -->
+        <div class="flex flex-wrap items-center gap-3 mb-6">
+            <label class="font-medium">Kuota Kursi:</label>
+            <input id="quotaInput" type="number" value="150" min="1" class="border p-2 w-24 rounded">
+            <button id="saveQuota" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                Simpan Kuota
+            </button>
+            <button id="updateRanking" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Update Ranking
+            </button>
+            <select id="filterStatus" class="border p-2 rounded">
+                <option value="ALL">Semua Peserta</option>
+                <option value="LULUS">Hanya LULUS</option>
+                <option value="TIDAK LOLOS">Hanya Tidak Lulus</option>
+            </select>
+            <button id="downloadPassed" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ml-auto">
+                Download Peserta Lulus
+            </button>
+        </div>
+
+        <p id="quotaInfo" class="text-gray-700 mb-4 text-sm"></p>
+
+        <!-- Tabel Peserta -->
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border">
+                <thead class="bg-gray-200 text-sm">
+                    <tr>
+                        <th class="border px-2 py-2">#</th>
+                        <th class="border px-2 py-2">Nama</th>
+                        <th class="border px-2 py-2">Email</th>
+                        <th class="border px-2 py-2">Skor</th>
+                        <th class="border px-2 py-2">Integritas</th>
+                        <th class="border px-2 py-2">Ranking</th>
+                        <th class="border px-2 py-2">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTable" class="text-sm"></tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-4 text-sm">
+            <div>
+                <label for="limitSelect">Tampilkan: </label>
+                <select id="limitSelect" class="border rounded px-2 py-1">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                </select> baris
+            </div>
+            <div id="paginationControls" class="flex items-center space-x-1"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let limit = 20;
+        let currentFilter = "ALL";
+
+        // Cek login
+        (async () => {
+            const res = await fetch('api/check_auth.php');
+            const data = await res.json();
+            if (!data.authenticated) {
+                location.href = 'login.html';
+            } else {
+                await loadQuota();
+                await loadData();
+            }
+        })();
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = 'api/logout.php';
+        });
+
+        // Load kuota
+        async function loadQuota() {
+            const res = await fetch('api/get_quota.php');
+            const data = await res.json();
+            document.getElementById('quotaInput').value = data.quota;
+            updateQuotaInfo(data.quota);
+        }
+
+        function updateQuotaInfo(q) {
+            document.getElementById('quotaInfo').textContent =
+                `Kuota kursi saat ini: ${q}. Peserta dengan ranking ≤ ${q} dan integritas LULUS akan berstatus LULUS.`;
+        }
+
+        // Simpan kuota
+        document.getElementById('saveQuota').addEventListener('click', async () => {
+            const newQuota = parseInt(document.getElementById('quotaInput').value);
+            const res = await fetch('api/update_quota.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quota: newQuota })
+            });
+            const data = await res.json();
+            alert(`Kuota diperbarui menjadi ${data.quota}`);
+            await fetch('api/update_ranking.php');
+            await loadData();
+        });
+
+        // Update ranking manual
+        document.getElementById('updateRanking').addEventListener('click', async () => {
+            await fetch('api/update_ranking.php');
+            await loadData();
+        });
+
+        // Filter status
+        document.getElementById('filterStatus').addEventListener('change', e => {
+            currentFilter = e.target.value;
+            loadData(currentPage);
+        });
+
+        // Ganti jumlah baris per halaman
+        document.getElementById('limitSelect').addEventListener('change', e => {
+            limit = parseInt(e.target.value);
+            currentPage = 1;
+            loadData(currentPage);
+        });
+
+        // Download CSV peserta LULUS
+        document.getElementById('downloadPassed').addEventListener('click', () => {
+            window.location.href = 'api/export_selected.php';
+        });
+
+        // Load data peserta dengan pagination
+        async function loadData(page = 1) {
+            const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
+            const result = await res.json();
+            const tbody = document.getElementById('dataTable');
+            tbody.innerHTML = '';
+
+            // Filter di sisi frontend (status)
+            const filtered = result.data.filter(item =>
+                currentFilter === 'ALL' ? true : item.status === currentFilter
+            );
+
+            filtered.forEach((item, i) => {
+                const integrityColor = item.integrity_status === 'LULUS' ? 'text-green-600' : 'text-red-600';
+                const statusColor = item.status === 'LULUS' ? 'text-green-600 font-semibold' : 'text-gray-500';
+
+                const row = document.createElement('tr');
+                row.classList.add('text-center', 'border', 'hover:bg-gray-50');
+                row.innerHTML = `
+            <td class="border px-2 py-1">${item.ranking}</td>
+            <td class="border px-2 py-1">${item.name}</td>
+            <td class="border px-2 py-1">${item.email}</td>
+            <td class="border px-2 py-1">${item.core_score}</td>
+            <td class="border px-2 py-1 ${integrityColor}">${item.integrity_status}</td>
+            <td class="border px-2 py-1">${item.ranking ?? '-'}</td>
+            <td class="border px-2 py-1 ${statusColor}">${item.status}</td>
+            `;
+                tbody.appendChild(row);
+            });
+
+            // Render pagination
+            renderPagination(result.page, result.totalPages);
+        }
+
+        function renderPagination(page, totalPages) {
+            const container = document.getElementById('paginationControls');
+            container.innerHTML = '';
+
+            const createBtn = (text, pageNum, disabled = false, active = false) => {
+                const btn = document.createElement('button');
+                btn.textContent = text;
+                btn.className = `px-2 py-1 border rounded ${active ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`;
+                if (!disabled && !active) btn.addEventListener('click', () => loadData(pageNum));
+                return btn;
+            };
+
+            container.appendChild(createBtn('Prev', page - 1, page <= 1));
+
+            const range = 2;
+            const start = Math.max(1, page - range);
+            const end = Math.min(totalPages, page + range);
+
+            for (let i = start; i <= end; i++) {
+                container.appendChild(createBtn(i, i, false, i === page));
+            }
+
+            container.appendChild(createBtn('Next', page + 1, page >= totalPages));
+
+            currentPage = page;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+Options -Indexes
+RewriteEngine On
+
+# Abaikan folder backend, biarkan Apache/PHP menanganinya langsung
+RewriteCond %{REQUEST_URI} ^api/ [OR]
+RewriteCond %{REQUEST_URI} ^includes/
+RewriteRule ^ - [L]
+
+# Jika file/folder tidak ada, arahkan ke router index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+ErrorDocument 404 /404.html
