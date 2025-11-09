@@ -1,12 +1,4 @@
 -- ===========================================================
--- DATABASE: kuesioner_app
--- Struktur lengkap untuk aplikasi kuesioner Likert + integritas
--- ===========================================================
-CREATE DATABASE IF NOT EXISTS kuesioner_app CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-
-USE kuesioner_app;
-
--- ===========================================================
 -- 1. Tabel: users (peserta)
 -- ===========================================================
 CREATE TABLE users (
