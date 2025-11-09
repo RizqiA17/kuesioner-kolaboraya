@@ -3,8 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Fasilitator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-5px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
@@ -34,14 +45,18 @@
             </button>
         </form>
 
-        <p id="errorMsg" class="mt-4 text-red-600 text-center hidden text-sm">
+        <p id="errorMsg" class="mt-4 text-red-600 text-center hidden text-sm fade-in">
             Username atau password salah.
         </p>
     </div>
 
     <script>
+        const errorMsg = document.getElementById('errorMsg');
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            errorMsg.classList.add('hidden'); // Reset error
+
             const formData = new FormData(e.target);
 
             try {
@@ -55,17 +70,16 @@
                 });
 
                 const data = await res.json();
+
                 if (data.success) {
                     window.location.href = data.redirect || '/dashboard';
                 } else {
-                    const errorMsg = document.getElementById('errorMsg');
-                    errorMsg.classList.remove('hidden');
                     errorMsg.textContent = data.message || 'Username atau password salah.';
+                    errorMsg.classList.remove('hidden');
                 }
             } catch (err) {
-                const errorMsg = document.getElementById('errorMsg');
-                errorMsg.classList.remove('hidden');
                 errorMsg.textContent = 'Terjadi kesalahan server. Silakan coba lagi.';
+                errorMsg.classList.remove('hidden');
             }
         });
     </script>
