@@ -1,12 +1,68 @@
 -- ===========================================================
 -- 1. Tabel: users (peserta)
 -- ===========================================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
+    organization VARCHAR(150) DEFAULT NULL,
+    phone VARCHAR(20) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tambahkan kolom 'organization' jika belum ada
+SET
+    @org_exists := (
+        SELECT
+            COUNT(*)
+        FROM
+            INFORMATION_SCHEMA.COLUMNS
+        WHERE
+            TABLE_NAME = 'users'
+            AND COLUMN_NAME = 'organization'
+    );
+
+SET
+    @sql_org := IF(
+        @org_exists = 0,
+        'ALTER TABLE users ADD COLUMN organization VARCHAR(150) DEFAULT NULL;',
+        'SELECT "Kolom organization sudah ada";'
+    );
+
+PREPARE stmt_org
+FROM
+    @sql_org;
+
+EXECUTE stmt_org;
+
+DEALLOCATE PREPARE stmt_org;
+
+-- Tambahkan kolom 'phone' jika belum ada
+SET
+    @phone_exists := (
+        SELECT
+            COUNT(*)
+        FROM
+            INFORMATION_SCHEMA.COLUMNS
+        WHERE
+            TABLE_NAME = 'users'
+            AND COLUMN_NAME = 'phone'
+    );
+
+SET
+    @sql_phone := IF(
+        @phone_exists = 0,
+        'ALTER TABLE users ADD COLUMN phone VARCHAR(20) DEFAULT NULL;',
+        'SELECT "Kolom phone sudah ada";'
+    );
+
+PREPARE stmt_phone
+FROM
+    @sql_phone;
+
+EXECUTE stmt_phone;
+
+DEALLOCATE PREPARE stmt_phone;
 
 -- ===========================================================
 -- 2. Tabel: responses (jawaban peserta)

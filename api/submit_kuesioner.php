@@ -7,11 +7,14 @@ header('Content-Type: application/json');
 $data = json_decode(file_get_contents('php://input'), true);
 $name = trim($data['name']);
 $email = trim($data['email']);
+$phone = trim($data['phone']);
+$organization = trim($data['organization']);
+
 $answers = $data['answers'] ?? [];
 
 // === Simpan User ===
-$stmt = $pdo->prepare("INSERT INTO users (name, email) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name)");
-$stmt->execute([$name, $email]);
+$stmt = $pdo->prepare("INSERT INTO users (name, email, phone, organization) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), phone = VALUES(phone), organization = VALUES(organization)");
+$stmt->execute([$name, $email, $phone, $organization]);
 $userId = $pdo->lastInsertId();
 if (!$userId) {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");

@@ -23,7 +23,7 @@ $total = $pdo->query("SELECT COUNT(*) FROM scores")->fetchColumn();
 // Ambil data peserta dengan urutan sesuai ranking dan integritas
 $stmt = $pdo->prepare("
     SELECT 
-        s.id, u.name, u.email, s.core_score, s.integrity_status, s.status, s.ranking
+        s.id, u.name, u.email, u.phone, u.organization, s.core_score, s.integrity_status, s.status, s.ranking
     FROM scores s
     JOIN users u ON u.id = s.user_id
     ORDER BY 
