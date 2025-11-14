@@ -41,54 +41,101 @@
             <div class="bg-white p-6 rounded-lg text-center relative max-w-sm w-full">
                 <h2 class="text-lg font-bold mb-4">Scan QR untuk membuka kuesioner</h2>
                 <canvas id="qrCanvas" class="mx-auto mb-4"></canvas>
+
                 <div class="flex flex-col sm:flex-row justify-center gap-2">
                     <button id="downloadQrBtn"
                         class="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                         Download QR
                     </button>
-                    <button id="closeQr"
-                        class="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Tutup</button>
+                    <button id="closeQr" class="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Tutup
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Konfirmasi -->
+        <!-- Modal Konfirmasi YES/NO -->
         <div id="confirmModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden p-4 z-20">
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden p-4 z-30">
             <div class="bg-white p-6 rounded-lg text-center max-w-sm w-full">
                 <p id="confirmText" class="mb-4 text-gray-800 font-medium"></p>
+
                 <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                    <button id="confirmYes"
-                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Ya</button>
-                    <button id="confirmNo"
-                        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Batal</button>
+                    <button id="confirmYes" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                        Ya
+                    </button>
+                    <button id="confirmNo" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Batal
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal PILIH DOWNLOAD ATAU HAPUS LANGSUNG -->
+        <div id="downloadChoiceModal"
+            class="fixed inset-0 bg-black bg-opacity-50 hidden z-40 p-4 flex justify-center items-center">
+            <div class="bg-white p-6 rounded-lg max-w-sm w-full text-center">
+
+                <h2 class="text-lg font-bold mb-3">Hapus Semua Data</h2>
+                <p class="text-gray-700 mb-4">
+                    Sebelum menghapus seluruh peserta, pilih opsi berikut:
+                </p>
+
+                <div class="flex flex-col gap-2">
+                    <button id="dlPassedBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                        Download Data Lulus
+                    </button>
+
+                    <button id="dlAllBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Download Semua Data
+                    </button>
+
+                    <button id="deleteDirectBtn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Hapus Tanpa Download
+                    </button>
+
+                    <button id="cancelDlChoice" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        Batal
+                    </button>
+                </div>
+
             </div>
         </div>
 
         <!-- Kuota & Aksi -->
         <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 mb-6">
             <label class="font-medium flex-shrink-0">Kuota Kursi:</label>
+
             <input id="quotaInput" type="number" value="150" min="1"
                 class="border p-2 w-full sm:w-24 rounded flex-shrink-0">
+
             <button id="saveQuota"
                 class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 flex-1 sm:flex-none w-full sm:w-auto">
                 Simpan Kuota
             </button>
+
             <button id="updateRanking"
                 class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex-1 sm:flex-none w-full sm:w-auto">
                 Update Ranking
             </button>
+
             <select id="filterStatus" class="border p-2 rounded flex-1 sm:flex-none w-full sm:w-auto">
                 <option value="ALL">Semua Peserta</option>
                 <option value="LULUS">Hanya LULUS</option>
                 <option value="TIDAK LOLOS">Hanya Tidak Lulus</option>
             </select>
+
             <button id="downloadPassed"
                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full sm:w-auto">
                 Download Peserta Lulus
             </button>
+
+            <button id="deleteAllBtn"
+                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition w-full sm:w-auto">
+                Hapus Semua Data
+            </button>
         </div>
+
 
         <p id="quotaInfo" class="text-gray-700 mb-4 text-sm"></p>
 
@@ -104,23 +151,28 @@
 
         <!-- Tabel Peserta -->
         <div class="overflow-x-auto max-h-[400px]">
-            <table class="min-w-[700px] w-full border-collapse border text-xs sm:text-sm">
+            <table class="hidden sm:table min-w-[700px] w-full border-collapse border text-sm">
                 <thead class="bg-gray-200 sticky top-0 z-10">
                     <tr>
                         <th class="border px-1 py-1">#</th>
                         <th class="border px-1 py-1">Nama</th>
                         <th class="border px-1 py-1">Email</th>
-                        <th class="border px-1 py-1 hidden sm:table-cell">No. Telepon</th>
-                        <th class="border px-1 py-1 hidden sm:table-cell">Organisasi</th>
+                        <th class="border px-1 py-1">No. Telepon</th>
+                        <th class="border px-1 py-1">Organisasi</th>
                         <th class="border px-1 py-1">Skor</th>
                         <th class="border px-1 py-1">Integritas</th>
                         <th class="border px-1 py-1">Ranking</th>
                         <th class="border px-1 py-1">Status</th>
+                        <th class="border px-1 py-1">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="dataTable"></tbody>
             </table>
+
+            <!-- MOBILE LIST -->
+            <div id="mobileList" class="sm:hidden flex flex-col gap-3"></div>
         </div>
+
 
         <!-- Pagination -->
         <div class="flex flex-col sm:flex-row justify-between items-center mt-4 text-sm gap-2 sm:gap-0">
@@ -148,9 +200,40 @@
         const loadingSpinner = document.getElementById('loadingSpinner');
         const confirmModal = document.getElementById('confirmModal');
         const confirmText = document.getElementById('confirmText');
-        let confirmCallback = null;
 
-        // Cek login dan load data awal
+        const downloadChoiceModal = document.getElementById("downloadChoiceModal");
+
+        // ==============================
+        // PROMISE-BASED CONFIRM MODAL
+        // ==============================
+        function showConfirm(message) {
+            return new Promise(resolve => {
+                confirmText.textContent = message;
+                confirmModal.classList.remove("hidden");
+
+                const yes = document.getElementById("confirmYes");
+                const no = document.getElementById("confirmNo");
+
+                const cleanup = () => {
+                    confirmModal.classList.add("hidden");
+                    yes.replaceWith(yes.cloneNode(true));
+                    no.replaceWith(no.cloneNode(true));
+                };
+
+                yes.addEventListener("click", () => {
+                    cleanup();
+                    resolve(true);
+                });
+                no.addEventListener("click", () => {
+                    cleanup();
+                    resolve(false);
+                });
+            });
+        }
+
+        // ==============================
+        // CEK LOGIN DAN LOAD AWAL
+        // ==============================
         (async () => {
             const res = await fetch('api/check_auth.php');
             const data = await res.json();
@@ -168,21 +251,20 @@
             window.location.href = 'api/logout.php';
         });
 
-        // Tombol share
+        // Share link
         document.getElementById('shareLinkBtn').addEventListener('click', () => {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
+            if (navigator.clipboard) {
                 navigator.clipboard.writeText(questionnaireUrl)
-                    .then(() => alert("Link kuesioner disalin ke clipboard!"))
-                    .catch(err => alert("Gagal menyalin link: " + err));
+                    .then(() => alert("Link kuesioner disalin ke clipboard!"));
             } else {
                 prompt("Salin link kuesioner berikut:", questionnaireUrl);
             }
         });
 
-        // Tombol QR
+        // QR modal
         document.getElementById('qrBtn').addEventListener('click', () => {
-            QRCode.toCanvas(qrCanvas, questionnaireUrl, { width: 200 }, function (error) {
-                if (error) console.error(error);
+            QRCode.toCanvas(qrCanvas, questionnaireUrl, { width: 200 }, (e) => {
+                if (e) console.error(e);
                 qrModal.classList.remove('hidden');
             });
         });
@@ -194,181 +276,295 @@
             link.click();
         });
 
-        // Modal konfirmasi
-        function showConfirm(message, callback) {
-            confirmText.textContent = message;
-            confirmModal.classList.remove('hidden');
-            confirmCallback = callback;
-        }
-        document.getElementById('confirmYes').addEventListener('click', () => {
-            confirmModal.classList.add('hidden');
-            if (confirmCallback) confirmCallback(true);
-        });
-        document.getElementById('confirmNo').addEventListener('click', () => {
-            confirmModal.classList.add('hidden');
-            if (confirmCallback) confirmCallback(false);
-        });
-
-        // Open/Close Kuesioner
+        // ==============================
+        // OPEN/CLOSE KUESIONER
+        // ==============================
         async function loadOpenStatus() {
             try {
-                const res = await fetch('api/open_question.php', { method: 'GET' });
+                const res = await fetch('api/open_question.php');
                 const data = await res.json();
-                if (data.success && typeof data.open_question !== 'undefined') {
-                    updateOpenButton(data.open_question);
-                } else {
-                    toggleOpenBtn.textContent = 'Tidak diketahui';
-                }
+                updateOpenButton(data.open_question);
             } catch (e) {
                 toggleOpenBtn.textContent = 'Error';
-                console.error(e);
             }
         }
         function updateOpenButton(status) {
-            toggleOpenBtn.textContent = status == 1 ? 'Tutup Kuesioner' : 'Buka Kuesioner';
             toggleOpenBtn.dataset.status = status;
+            toggleOpenBtn.textContent = status == 1 ? 'Tutup Kuesioner' : 'Buka Kuesioner';
         }
-        toggleOpenBtn.addEventListener('click', () => {
+
+        toggleOpenBtn.addEventListener("click", async () => {
             const newStatus = toggleOpenBtn.dataset.status == 1 ? 0 : 1;
-            showConfirm(
-                `Apakah Anda yakin ingin ${newStatus ? 'membuka' : 'menutup'} kuesioner?`,
-                async (confirmed) => {
-                    if (!confirmed) return;
-                    try {
-                        const res = await fetch('api/open_question.php', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ open: newStatus })
-                        });
-                        const data = await res.json();
-                        if (data.success) {
-                            updateOpenButton(newStatus);
-                            alert(data.message);
-                        } else {
-                            alert(data.message || 'Gagal memperbarui status');
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        alert('Terjadi kesalahan saat menghubungi server.');
-                    }
-                }
-            );
+
+            const ok = await showConfirm(`Apakah Anda yakin ingin ${newStatus ? 'membuka' : 'menutup'} kuesioner?`);
+            if (!ok) return;
+
+            const res = await fetch('api/open_question.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ open: newStatus })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                updateOpenButton(newStatus);
+                alert(data.message);
+            }
         });
 
-        // Kuota
+        // ==============================
+        // KUOTA
+        // ==============================
         async function loadQuota() {
-            const res = await fetch('api/get_quota.php');
+            const res = await fetch("api/get_quota.php");
             const data = await res.json();
             document.getElementById('quotaInput').value = data.quota;
-            updateQuotaInfo(data.quota);
-        }
-        function updateQuotaInfo(q) {
             document.getElementById('quotaInfo').textContent =
-                `Kuota kursi saat ini: ${q}. Peserta dengan ranking ≤ ${q} dan integritas LULUS akan berstatus LULUS.`;
+                `Kuota kursi saat ini: ${data.quota}. Peserta dengan ranking ≤ ${data.quota} dan integritas LULUS akan berstatus LULUS.`;
         }
-        document.getElementById('saveQuota').addEventListener('click', () => {
+
+        document.getElementById('saveQuota').addEventListener('click', async () => {
             const newQuota = parseInt(document.getElementById('quotaInput').value);
-            showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${newQuota}?`, async (confirmed) => {
-                if (!confirmed) return;
-                const res = await fetch('api/update_quota.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ quota: newQuota })
-                });
-                const data = await res.json();
-                alert(`Kuota diperbarui menjadi ${data.quota}`);
-                await fetch('api/update_ranking.php');
-                await loadData();
+
+            const ok = await showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${newQuota}?`);
+            if (!ok) return;
+
+            const res = await fetch('api/update_quota.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quota: newQuota })
             });
+            await res.json();
+
+            await fetch('api/update_ranking.php');
+            await loadData();
         });
 
-        document.getElementById('updateRanking').addEventListener('click', () => {
-            showConfirm('Apakah yakin ingin memperbarui ranking peserta?', async (confirmed) => {
-                if (!confirmed) return;
-                await fetch('api/update_ranking.php');
-                await loadData();
-            });
+        // Update ranking manual
+        document.getElementById('updateRanking').addEventListener('click', async () => {
+            const ok = await showConfirm('Apakah yakin ingin memperbarui ranking peserta?');
+            if (!ok) return;
+            await fetch('api/update_ranking.php');
+            await loadData();
         });
 
+        // ==============================
+        // FILTER DAN LIMIT
+        // ==============================
         document.getElementById('filterStatus').addEventListener('change', e => {
             currentFilter = e.target.value;
             loadData(currentPage);
         });
+
         document.getElementById('limitSelect').addEventListener('change', e => {
             limit = parseInt(e.target.value);
             currentPage = 1;
             loadData(currentPage);
         });
+
         document.getElementById('downloadPassed').addEventListener('click', () => {
             window.location.href = 'api/export_selected.php';
         });
 
-        // Load data peserta
+        // ==============================
+        // LOAD DATA PESERTA
+        // ==============================
         async function loadData(page = 1) {
             loadingSpinner.classList.remove('hidden');
+
             const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
             const result = await res.json();
+
             loadingSpinner.classList.add('hidden');
 
-            const tbody = document.getElementById('dataTable');
-            const oldRows = Array.from(tbody.children);
-            tbody.innerHTML = '';
-
             const filtered = result.data.filter(item =>
-                currentFilter === 'ALL' ? true : item.status === currentFilter
+                currentFilter === "ALL" ? true : item.status === currentFilter
             );
 
-            filtered.forEach((item, index) => {
-                const integrityColor = item.integrity_status === 'LULUS' ? 'text-green-600' : 'text-red-600';
-                const statusColor = item.status === 'LULUS' ? 'text-green-600 font-semibold' : 'text-gray-500';
+            const tbody = document.getElementById('dataTable');
+            const mobileList = document.getElementById('mobileList');
+
+            tbody.innerHTML = '';
+            mobileList.innerHTML = '';
+
+            filtered.forEach((item) => {
+
+                // =======================================
+                // DESKTOP TABLE ROW
+                // =======================================
                 const row = document.createElement('tr');
-                row.classList.add('text-center', 'border', 'hover:bg-gray-50');
+                row.classList.add('text-center', 'border');
+
                 row.innerHTML = `
-                    <td class="border px-2 py-1">${item.ranking}</td>
-                    <td class="border px-2 py-1">${item.name}</td>
-                    <td class="border px-2 py-1">${item.email}</td>
-                    <td class="border px-2 py-1">${item.phone}</td>
-                    <td class="border px-2 py-1">${item.organization}</td>
-                    <td class="border px-2 py-1">${item.core_score}</td>
-                    <td class="border px-2 py-1 ${integrityColor}">${item.integrity_status}</td>
-                    <td class="border px-2 py-1">${item.ranking ?? '-'}</td>
-                    <td class="border px-2 py-1 ${statusColor}">${item.status}</td>
-                `;
-                // Highlight baris baru / berubah
-                const oldRow = oldRows[index];
-                if (!oldRow || oldRow.innerHTML !== row.innerHTML) {
-                    row.classList.add('bg-yellow-100');
-                    setTimeout(() => row.classList.remove('bg-yellow-100'), 1500);
-                }
+            <td class="border px-2 py-1">${item.ranking}</td>
+            <td class="border px-2 py-1">${item.name}</td>
+            <td class="border px-2 py-1">${item.email}</td>
+            <td class="border px-2 py-1 hidden sm:table-cell">${item.phone}</td>
+            <td class="border px-2 py-1 hidden sm:table-cell">${item.organization}</td>
+            <td class="border px-2 py-1">${item.core_score}</td>
+            <td class="border px-2 py-1 ${item.integrity_status === 'LULUS' ? 'text-green-600' : 'text-red-600'}">
+                ${item.integrity_status}
+            </td>
+            <td class="border px-2 py-1">${item.ranking}</td>
+            <td class="border px-2 py-1">${item.status}</td>
+            <td class="border px-2 py-1">
+                <button class="text-red-600 delete-row-btn" data-id="${item.user_id}">
+                    Hapus
+                </button>
+            </td>
+        `;
                 tbody.appendChild(row);
+
+
+                // =======================================
+                // MOBILE CARD VERSION
+                // =======================================
+                const card = document.createElement('div');
+                card.className = "border rounded-lg p-3 bg-white shadow-sm sm:hidden";
+
+                card.innerHTML = `
+            <div class="flex justify-between">
+                <span class="font-semibold">${item.name}</span>
+                <span class="text-xs bg-gray-200 px-2 py-0.5 rounded">${item.ranking}</span>
+            </div>
+
+            <div class="text-sm mt-2 space-y-1">
+                <p><strong>Email:</strong> ${item.email}</p>
+                <p><strong>Telepon:</strong> ${item.phone}</p>
+                <p><strong>Organisasi:</strong> ${item.organization}</p>
+                <p><strong>Skor:</strong> ${item.core_score}</p>
+                <p>
+                    <strong>Integritas:</strong>
+                    <span class="${item.integrity_status === 'LULUS' ? 'text-green-600' : 'text-red-600'}">
+                        ${item.integrity_status}
+                    </span>
+                </p>
+                <p><strong>Status:</strong> ${item.status}</p>
+            </div>
+
+            <button 
+                class="mt-3 w-full bg-red-600 text-white py-1 rounded delete-row-btn" 
+                data-id="${item.user_id}">
+                Hapus
+            </button>
+        `;
+
+                mobileList.appendChild(card);
             });
 
             renderPagination(result.page, result.totalPages);
         }
 
+
+        // ==============================
+        // HAPUS SATU BARIS
+        // ==============================
+        document.addEventListener("click", async e => {
+            if (!e.target.classList.contains('delete-row-btn')) return;
+
+            const id = e.target.dataset.id;
+            const ok = await showConfirm("Hapus peserta ini?");
+            if (!ok) return;
+
+            const res = await fetch("api/delete_one.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id })
+            });
+            const data = await res.json();
+
+            if (data.success) loadData(currentPage);
+            else alert("Gagal menghapus.");
+        });
+
+        // ==============================
+        // HAPUS SEMUA DATA — 3 STEP FLOW
+        // ==============================
+        document.getElementById("deleteAllBtn").addEventListener("click", async () => {
+
+            // STEP 1 — Konfirmasi awal
+            const ok1 = await showConfirm("Yakin ingin menghapus SEMUA data peserta?");
+            if (!ok1) return;
+
+            // STEP 2 — Tampilkan modal pilihan download
+            downloadChoiceModal.classList.remove("hidden");
+
+            const closeModal = () => downloadChoiceModal.classList.add("hidden");
+
+            document.getElementById("dlPassedBtn").onclick = async () => {
+                window.open("api/export_selected.php", "_blank");
+                await finalDeleteConfirm();
+            };
+
+            document.getElementById("dlAllBtn").onclick = async () => {
+                window.open("api/export_all.php", "_blank");
+                await finalDeleteConfirm();
+            };
+
+            document.getElementById("deleteDirectBtn").onclick = async () => {
+                closeModal();
+                await doFinalDelete();
+            };
+
+            document.getElementById("cancelDlChoice").onclick = () => {
+                closeModal();
+            };
+        });
+
+        // Konfirmasi setelah download
+        async function finalDeleteConfirm() {
+            downloadChoiceModal.classList.add("hidden");
+
+            const ok = await showConfirm("Data sudah diunduh. Hapus sekarang?");
+            if (!ok) return;
+
+            await doFinalDelete();
+        }
+
+        async function doFinalDelete() {
+            const res = await fetch("api/delete_all.php");
+            const data = await res.json();
+
+            if (data.success) {
+                alert("Semua data telah dihapus.");
+                loadData(1);
+            } else {
+                alert("Gagal menghapus semua data.");
+            }
+        }
+
+        // ==============================
+        // PAGINATION
+        // ==============================
         function renderPagination(page, totalPages) {
             const container = document.getElementById('paginationControls');
             container.innerHTML = '';
 
-            const createBtn = (text, pageNum, disabled = false, active = false) => {
+            const makeBtn = (text, pg, disabled = false, active = false) => {
                 const btn = document.createElement('button');
                 btn.textContent = text;
-                btn.className = `px-2 py-1 border rounded ${active ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`;
-                if (!disabled && !active) btn.addEventListener('click', () => loadData(pageNum));
+                btn.className =
+                    `px-2 py-1 border rounded ${active ? "bg-blue-600 text-white" : "bg-gray-100 hover:bg-gray-200"} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`;
+                if (!disabled && !active) btn.addEventListener('click', () => loadData(pg));
                 return btn;
             };
 
-            container.appendChild(createBtn('Prev', page - 1, page <= 1));
+            container.appendChild(makeBtn("Prev", page - 1, page <= 1));
+
             const range = 2;
             const start = Math.max(1, page - range);
             const end = Math.min(totalPages, page + range);
+
             for (let i = start; i <= end; i++) {
-                container.appendChild(createBtn(i, i, false, i === page));
+                container.appendChild(makeBtn(i, i, false, i === page));
             }
-            container.appendChild(createBtn('Next', page + 1, page >= totalPages));
+
+            container.appendChild(makeBtn("Next", page + 1, page >= totalPages));
+
             currentPage = page;
         }
     </script>
+
 </body>
 
 </html>
