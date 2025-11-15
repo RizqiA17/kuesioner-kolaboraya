@@ -406,6 +406,7 @@
                     .sort((a, b) => {
                         // kalau filter LULUS, urutkan manual LULUS setelah otomatis
                         if (currentFilter === "LULUS") {
+                            console.log(a);
                             // manual override YES taruh di belakang otomatis
                             if (a.manual_override === "YES" && b.manual_override === "NO") return 1;
                             if (a.manual_override === "NO" && b.manual_override === "YES") return -1;
@@ -439,7 +440,7 @@
                         <td class="px-4 py-3">${escapeHtml(safeStatus)}</td>
                         <td class="px-4 py-3">
                             <button class="text-blue-600 view-answer-btn" data-id="${item.user_id}">Lihat</button>
-                            <button class="text-amber-600 edit-status-btn ml-3" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button>
+                            <!-- <button class="text-amber-600 edit-status-btn ml-3" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button> -->
                             <button class="text-purple-600 send-email-btn" data-id="${item.user_id}">
                                 Email
                             </button>
@@ -452,31 +453,32 @@
                     const card = document.createElement('div');
                     card.className = 'bg-white rounded-xl p-4 shadow-sm sm:hidden';
                     card.innerHTML = `
-            <div class="flex justify-between">
-              <div>
-                <div class="font-semibold">${escapeHtml(item.name)}</div>
-                <div class="text-xs text-slate-500">${escapeHtml(item.email)}</div>
-              </div>
-              <div class="text-right">
-                <div class="text-xs text-slate-500">Rank</div>
-                <div class="text-sm font-medium">${ranking}</div>
-              </div>
-            </div>
-
-            <div class="mt-3 text-sm text-slate-600 space-y-1">
-              <div><strong>Telepon:</strong> ${escapeHtml(safePhone)}</div>
-              <div><strong>Organisasi:</strong> ${escapeHtml(safeOrg)}</div>
-              <div><strong>Skor:</strong> ${item.core_score ?? '-'}</div>
-              <div><strong>Integritas:</strong> <span class="${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status ?? '-'}</span></div>
-              <div><strong>Status:</strong> ${escapeHtml(safeStatus)}</div>
-            </div>
-
-            <div class="mt-3 space-y-2">
-              <button class="w-full bg-blue-600 text-white py-2 rounded view-answer-btn" data-id="${item.user_id}">Lihat Jawaban</button>
-              <button class="w-full bg-amber-600 text-white py-2 rounded edit-status-btn" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button>
-              <button class="w-full bg-rose-600 text-white py-2 rounded delete-row-btn" data-id="${item.id}">Hapus</button>
-            </div>
-          `;
+                        <div class="flex justify-between">
+                            <div>
+                                <div class="font-semibold">${escapeHtml(item.name)}</div>
+                                <div class="text-xs text-slate-500">${escapeHtml(item.email)}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-slate-500">Rank</div>
+                                <div class="text-sm font-medium">${ranking}</div>
+                            </div>
+                        </div>
+                    
+                        <div class="mt-3 text-sm text-slate-600 space-y-1">
+                            <div><strong>Telepon:</strong> ${escapeHtml(safePhone)}</div>
+                            <div><strong>Organisasi:</strong> ${escapeHtml(safeOrg)}</div>
+                            <div><strong>Skor:</strong> ${item.core_score ?? '-'}</div>
+                            <div><strong>Integritas:</strong> <span class="${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status ?? '-'}</span></div>
+                            <div><strong>Status:</strong> ${escapeHtml(safeStatus)}</div>
+                        </div>
+                    
+                        <div class="mt-3 space-y-2">
+                            <button class="w-full bg-blue-600 text-white py-2 rounded view-answer-btn" data-id="${item.user_id}">Lihat Jawaban</button>
+                            <!-- <button class="w-full bg-amber-600 text-white py-2 rounded edit-status-btn" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button> -->
+                            <button class="w-full bg-purple-600 text-white py-2 rounded send-email-btn" data-id="${item.user_id}">Email</button>
+                            <button class="w-full bg-rose-600 text-white py-2 rounded delete-row-btn" data-id="${item.id}">Hapus</button>
+                        </div>
+                        `;
                     mobileList.appendChild(card);
                 });
 
