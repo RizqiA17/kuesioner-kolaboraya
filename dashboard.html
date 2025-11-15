@@ -118,14 +118,22 @@
                         class="px-4 py-2 rounded-md text-sm font-medium bg-sky-600 text-white hover:bg-sky-700 transition-colors">
                         Update Ranking
                     </button>
-
-                    <select id="filterStatus"
-                        class="px-3 py-2 rounded-md border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                        <option value="ALL">Semua Peserta</option>
-                        <option value="LULUS">Hanya LULUS</option>
-                        <option value="TIDAK LOLOS">Hanya Tidak Lolos</option>
-                    </select>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal Lihat Jawaban -->
+        <div id="answerModal"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden p-4 z-40">
+            <div class="bg-white rounded-lg p-6 max-w-lg w-full relative">
+                <h2 class="text-xl font-bold mb-3">Jawaban Peserta</h2>
+                <div id="answerContent" class="text-gray-800 max-h-96 overflow-y-auto border rounded p-3 text-sm"></div>
+
+                <button id="closeAnswerModal" class="mt-4 w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700">
+                    Tutup
+                </button>
+            </div>
+        </div>
 
                 <!-- Download + Delete -->
                 <div class="flex items-center gap-3 justify-end">
@@ -489,13 +497,18 @@
             <td class="px-4 py-3 ${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">
                 ${item.integrity_status}
             </td>
-            <td class="px-4 py-3">${item.ranking}</td>
-            <td class="px-4 py-3">${item.status}</td>
-            <td class="px-4 py-3 text-center">
-                <button class="text-rose-600 delete-row-btn px-2 py-1 rounded" data-id="${item.user_id}">Hapus</button>
+            <td class="border px-2 py-1">${item.ranking}</td>
+            <td class="border px-2 py-1">${item.status}</td>
+            <td class="border px-2 py-1">
+                <button class="text-blue-600 view-answer-btn" data-id="${item.user_id}">
+                    Lihat
+                </button>
+                <button class="text-red-600 delete-row-btn" data-id="${item.user_id}">
+                    Hapus
+                </button>
             </td>
             `;
-                    tbody.appendChild(row);
+                tbody.appendChild(row);
 
                     // mobile card
                     const card = document.createElement('div');
@@ -520,12 +533,20 @@
                 <div><span class="font-medium">Status:</span> ${item.status}</div>
             </div>
 
-            <div class="mt-3">
-                <button class="w-full bg-rose-600 text-white px-3 py-2 rounded-md delete-row-btn" data-id="${item.user_id}">Hapus</button>
-            </div>
+            <button 
+                class="mt-3 w-full bg-blue-600 text-white py-1 rounded view-answer-btn" 
+                data-id="${item.user_id}">
+                Lihat Jawaban
+            </button>
+            <button 
+                class="mt-2 w-full bg-red-600 text-white py-1 rounded delete-row-btn" 
+                data-id="${item.user_id}">
+                Hapus
+            </button>
             `;
-                    mobileList.appendChild(card);
-                });
+
+                mobileList.appendChild(card);
+            });
 
                 renderPagination(result.page, result.totalPages);
             } catch (e) {
@@ -631,6 +652,46 @@
             container.appendChild(makeBtn('Next', page + 1, page >= totalPages));
             currentPage = page;
         }
+
+        // Modal elemen
+        const answerModal = document.getElementById("answerModal");
+        const answerContent = document.getElementById("answerContent");
+        const closeAnswerModal = document.getElementById("closeAnswerModal");
+
+        // Tutup modal
+        closeAnswerModal.addEventListener("click", () => {
+            answerModal.classList.add("hidden");
+        });
+
+        // Event untuk tombol LIHAT
+        document.addEventListener("click", async (e) => {
+            if (!e.target.classList.contains("view-answer-btn")) return;
+
+            const userId = e.target.dataset.id;
+
+            const res = await fetch("api/get_user_answers.php?id=" + userId);
+            const data = await res.json();
+
+            if (!data.success) {
+                alert("Gagal memuat jawaban.");
+                return;
+            }
+
+            // Format tampilan jawaban
+            let html = "";
+            data.answers.forEach((a, i) => {
+                html += `
+            <div class="mb-3">
+                <p class="font-medium">${i + 1}. ${a.question}</p>
+                <p class="text-blue-700 font-semibold">${a.answer_text}</p>
+            </div>
+        `;
+            });
+
+            answerContent.innerHTML = html;
+            answerModal.classList.remove("hidden");
+        });
+
     </script>
 </body>
 
