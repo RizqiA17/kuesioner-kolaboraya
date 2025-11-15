@@ -106,54 +106,43 @@
         <section class="bg-white rounded-lg shadow p-6 border border-slate-200 mb-6">
             <div class="flex flex-col gap-4">
                 <div class="flex flex-wrap items-center gap-4 justify-between">
-                    <div class="flex items-center gap-3">
+                    <div class="flex sm:items-center gap-3 max-sm:flex-col max-sm:w-full">
                         <label class="text-sm font-medium text-slate-700">Kuota Kursi</label>
                         <div class="relative">
                             <input id="quotaInput" type="number" min="1" value="150"
-                                class="w-28 px-3 py-2 rounded-md border border-slate-300" />
+                                class="sm:w-64 w-full px-4 py-2 rounded-md border border-slate-300" />
                             <button id="saveQuota"
-                                class="absolute right-0 top-0 h-full bg-blue-600 text-white px-3 rounded-r-md">
+                                class="absolute right-0 top-0 h-full bg-gray-800 text-slate-50 px-3 rounded-r-md flex justify-center items-center hover:bg-gray-900 active:bg-gray-950 active:text-slate-200">
                                 <span class="material-symbols-outlined">save</span>
                             </button>
                         </div>
                     </div>
 
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-3">
+
                     <div class="flex items-center gap-3 flex-wrap">
-                        <button id="updateRanking"
-                            class="bg-sky-600 text-white px-4 py-2 rounded-md flex items-center gap-2">
-                            <span class="material-symbols-outlined">
-                                refresh
-                            </span>
-                            Update Ranking</button>
+
                         <button id="sendEmailAllBtn"
-                            class="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                            class="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors flex items-center gap-2 max-sm:flex-grow">
                             <span class="material-symbols-outlined">
                                 mail
                             </span>
                             Kirim Email Lolos
                         </button>
-                    </div>
-
-                </div>
-
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <select id="filterStatus" class="px-3 py-2 rounded-md border border-slate-300">
-                            <option value="ALL">Semua Status</option>
-                            <option value="LULUS">LULUS</option>
-                            <option value="TIDAK LOLOS">TIDAK LOLOS</option>
-                        </select>
 
                         <button id="downloadPassed"
-                            class="bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center gap-2">
+                            class="bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow">
                             <span class="material-symbols-outlined">download</span> Peserta Lulus
                         </button>
                     </div>
 
-                    <div>
+                    <div class="max-sm:flex-grow">                        
                         <button id="deleteAllBtn"
-                            class="bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2">
-                            <span class="material-symbols-outlined">delete</span> Hapus Semua Data
+                            class="bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2 w-full">
+                            <span class="material-symbols-outlined">delete</span> 
+                            Semua Data
                         </button>
                     </div>
                 </div>
@@ -171,8 +160,26 @@
             <div class="text-sm text-slate-500 mt-2">Memuat data peserta...</div>
         </div>
 
+        <div class="flex justify-between">
+
+            <select id="filterStatus" class="px-3 py-2 rounded-md border border-slate-300 mb-4">
+                <option value="ALL">Semua Status</option>
+                <option value="LULUS">LULUS</option>
+                <option value="TIDAK LOLOS">TIDAK LOLOS</option>
+            </select>
+
+            <button id="updateRanking" class="bg-sky-600 h-fit text-white px-4 py-2 rounded-md flex items-center gap-2">
+                <span class="material-symbols-outlined">
+                    refresh
+                </span>
+                <p class="max-sm:hidden">Update Ranking</p>
+            </button>
+
+        </div>
+
         <!-- Table & Mobile -->
         <div class="overflow-hidden rounded-xl border border-slate-100 bg-white">
+
             <div class="overflow-x-auto">
                 <table class="min-w-full hidden sm:table text-sm">
                     <thead class="bg-slate-50">
@@ -194,7 +201,7 @@
             </div>
 
             <!-- mobile -->
-            <div id="mobileList" class="sm:hidden p-4 space-y-3 bg-slate-50"></div>
+            <div id="mobileList" class="sm:hidden space-y-3 bg-slate-50"></div>
         </div>
 
         <!-- Pagination -->
