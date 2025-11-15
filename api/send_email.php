@@ -4,6 +4,7 @@ require_once "../helper/email_helper.php";
 
 header("Content-Type: application/json");
 
+// Ambil semua peserta yang LULUS
 $stmt = $pdo->query("
     SELECT u.email, u.name 
     FROM scores s 
@@ -13,27 +14,24 @@ $stmt = $pdo->query("
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (!$users) {
-    echo json_encode(["success" => false, "message" => "Tidak ada peserta yang LULUS."]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Tidak ada peserta yang LULUS."
+    ]);
     exit;
 }
 
+// Load template email
 $template = file_get_contents(__DIR__ . '/../email_templates/lulus.html');
 
-$total = count($users);
-$sent  = 0;
+// Subject email
+$subject = "Selamat! Anda Lulus Seleksi";
 
-foreach ($users as $u) {
+// Kirim email menggunakan bulk
+$sent = sendBulkMails($users, $subject, $template);
 
-    $htmlBody = str_replace('{{name}}', $u['name'], $template);
-
-    if (sendHtmlMail($u['email'], $u['name'], "Selamat! Anda Lulus Seleksi", $htmlBody)) {
-        $sent++;
-    }
-
-    usleep(150000);
-}
-
+// Balikkan response
 echo json_encode([
     "success" => true,
-    "message" => "Email diproses: {$sent} dari {$total} peserta."
+    "message" => "Email diproses: {$sent} dari " . count($users) . " peserta."
 ]);

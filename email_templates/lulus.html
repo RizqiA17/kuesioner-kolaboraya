@@ -1,24 +1,40 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Pengumuman Kelulusan</title>
 </head>
-<body style="font-family: Arial; background:#f6f6f6; padding:20px;">
-    <div style="max-width:600px; margin:auto; background:white; padding:20px; border-radius:8px;">
-        <h2 style="color:#2d8f2d;">Selamat! Anda Lulus Seleksi</h2>
 
-        <p>Halo {{name}},</p>
+<body style="margin:0; padding:20px; font-family: 'Arial', sans-serif; background:#f5f5f5;">
+    <div
+        style="max-width:600px; margin:auto; background:#ffffff; padding:30px; border-radius:12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
 
-        <p>
-            Berdasarkan hasil kuesioner, Anda dinyatakan <strong>LULUS</strong>.
-            Kami akan menghubungi Anda untuk tahap berikutnya.
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom:20px;">
+            <h2 style="margin:10px 0 0 0; font-size:26px; color:#333333;">Selamat! Anda Lulus Seleksi</h2>
+        </div>
+
+        <!-- Body -->
+        <p style="font-size:16px; color:#555555; line-height:1.6;">
+            Halo <strong>{{name}}</strong>,
         </p>
 
-        <p>Terima kasih.</p>
+        <p style="font-size:16px; color:#555555; line-height:1.6;">
+            Berdasarkan hasil kuesioner, Anda dinyatakan <strong>LULUS</strong>.
+            Tim kami akan menghubungi Anda untuk tahap berikutnya.
+        </p>
 
-        <hr>
-        <small>Kuesioner Kolaboraya</small>
+        <p style="font-size:16px; color:#555555; line-height:1.6;">
+            Terima kasih atas partisipasi Anda.
+        </p>
+
+        <!-- Footer -->
+        <hr style="border:none; border-top:1px solid #e0e0e0; margin:20px 0;">
+        <p style="font-size:12px; color:#999999; text-align:center;">
+            Kuesioner Kolaboraya &bull; &copy; 2025
+        </p>
     </div>
 </body>
+
 </html>
