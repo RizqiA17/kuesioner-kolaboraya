@@ -9,7 +9,7 @@ if (!isset($_SESSION['facilitator_id'])) {
     exit;
 }
 
-// Ambil parameter pagination
+// Pagination
 $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $limit = isset($_GET['limit']) ? max(1, intval($_GET['limit'])) : 20;
 $offset = ($page - 1) * $limit;
@@ -20,10 +20,21 @@ $quota = $pdo->query("SELECT quota FROM quota_settings WHERE id = 1")->fetchColu
 // Hitung total peserta
 $total = $pdo->query("SELECT COUNT(*) FROM scores")->fetchColumn();
 
-// Ambil data peserta dengan urutan sesuai ranking dan integritas
+// Ambil data peserta
 $stmt = $pdo->prepare("
     SELECT 
-        s.id, s.user_id, u.name, u.email, u.phone, u.organization, s.core_score, s.integrity_status, s.status, s.ranking
+        s.id,
+        s.user_id,
+        u.name,
+        u.email,
+        u.phone,
+        u.organization,
+        s.core_score,
+        s.integrity_status,
+        s.status,
+        s.manual_override,
+        s.manual_status,
+        s.ranking
     FROM scores s
     JOIN users u ON u.id = s.user_id
     ORDER BY 
@@ -31,11 +42,33 @@ $stmt = $pdo->prepare("
         s.ranking ASC
     LIMIT :limit OFFSET :offset
 ");
+
 $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 
-$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// PROSES STATUS FINAL untuk frontend
+$data = [];
+foreach ($rows as $r) {
+    $finalStatus = $r['manual_override'] === "YES"
+        ? $r['manual_status']
+        : $r['status'];
+
+    $data[] = [
+        'id' => (int)$r['id'],
+        'user_id' => (int)$r['user_id'],
+        'name' => $r['name'],
+        'email' => $r['email'],
+        'phone' => $r['phone'],
+        'organization' => $r['organization'],
+        'core_score' => (int)$r['core_score'],
+        'integrity_status' => $r['integrity_status'],
+        'ranking' => (int)$r['ranking'],
+        'status' => $finalStatus     // status sudah bersih, tidak undefined
+    ];
+}
 
 // Hitung total halaman
 $totalPages = ceil($total / $limit);

@@ -254,6 +254,10 @@ VALUES
         'Integritas (Faktor Kritis)'
     );
 
+ALTER TABLE scores 
+ADD COLUMN manual_override ENUM('YES','NO') DEFAULT 'NO',
+ADD COLUMN manual_status ENUM('LULUS','TIDAK LOLOS') DEFAULT NULL;
+
 -- ===========================================================
 -- END OF FILE
 -- ===========================================================

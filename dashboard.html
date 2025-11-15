@@ -6,14 +6,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Dashboard Fasilitator — Kuesioner</title>
 
-    <!-- Tailwind CDN (dev / quick prototyping). Replace with build in production. -->
+    <!-- Tailwind (dev only) & QR lib -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <style>
-        /* small niceties */
         body {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -29,6 +28,13 @@
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
         }
+
+        /* small helper to make action buttons visually consistent */
+        .action-btn {
+            padding: .5rem .85rem;
+            border-radius: .5rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -36,197 +42,151 @@
 
     <div class="max-w-6xl mx-auto p-6">
 
-        <!-- Top header -->
+        <!-- Header -->
         <header
-            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 bg-white rounded-lg shadow p-6 border border-slate-200">
-
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 bg-white rounded-lg p-6 border border-slate-200">
             <div>
                 <h1 class="text-3xl font-semibold text-slate-800">Dashboard Fasilitator</h1>
-                <p class="text-sm text-slate-500 mt-2">Kelola peserta, kuota, dan hasil kuesioner</p>
+                <p class="text-sm text-slate-500 mt-1">Kelola peserta, kuota, dan hasil kuesioner</p>
             </div>
 
             <div class="flex flex-wrap gap-3 w-full sm:w-auto">
-
-                <!-- Share Link -->
-                <button id="shareLinkBtn"
-                    class="px-4 py-2 rounded-lg shadow-sm bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors flex items-center gap-2">
-                    <!-- Icon: Link -->
-                    <span class="material-symbols-outlined">
-                        link
-                    </span>
-                    Link Kuesioner
+                <button id="shareLinkBtn" class="flex items-center gap-2 bg-emerald-600 text-white action-btn">
+                    <span class="material-symbols-outlined">link</span> Link Kuesioner
                 </button>
 
-                <!-- QR -->
-                <button id="qrBtn"
-                    class="px-4 py-2 rounded-lg shadow-sm bg-yellow-500 text-slate-800 text-sm font-medium hover:bg-yellow-600 transition-colors flex items-center gap-2">
-                    <!-- Icon: QrCode -->
-                    <span class="material-symbols-outlined">
-                        qr_code
-                    </span>
-                    Tampilkan QR
+                <button id="qrBtn" class="flex items-center gap-2 bg-yellow-500 text-slate-800 action-btn">
+                    <span class="material-symbols-outlined">qr_code</span> Tampilkan QR
                 </button>
 
-                <!-- Open / Close -->
-                <button id="toggleOpenBtn"
-                    class="px-4 py-2 rounded-lg shadow-sm bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
-                    <!-- Icon: Toggle -->
-                    <span class="material-symbols-outlined" id="toggleOpenIcon">
-                        cached
-                    </span>
+                <button id="toggleOpenBtn" data-status="0"
+                    class="flex items-center gap-2 bg-blue-600 text-white action-btn">
+                    <span class="material-symbols-outlined" id="toggleOpenIcon">cached</span>
                     Loading...
                 </button>
 
-                <!-- Logout -->
-                <button id="logoutBtn"
-                    class="px-4 py-2 rounded-lg shadow-sm bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors flex items-center gap-2">
-                    <!-- Icon: LogOut -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 12H3m12 0l-4 4m4-4l-4-4m8-5h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2" />
-                    </svg>
-                    Logout
+                <button id="logoutBtn" class="flex items-center gap-2 bg-red-600 text-white action-btn">
+                    <span class="material-symbols-outlined">logout</span> Logout
                 </button>
-
             </div>
         </header>
 
-
-
-
-        <!-- Main card -->
-        <main class="soft-card p-5">
-
-            <!-- Action row (Kuota, Controls) -->
-            <section class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center mb-6 
-                bg-white rounded-lg shadow p-6 border border-slate-200">
-                <!-- Kuota Kursi -->
-                <div class="flex items-center gap-3">
-                    <label class="text-sm font-medium text-slate-700">Kuota Kursi</label>
-                    <input id="quotaInput" type="number" min="1" value="150"
-                        class="w-28 px-3 py-2 rounded-md border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-                    <button id="saveQuota"
-                        class="ml-2 px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-                        Simpan Kuota
-                    </button>
-                </div>
-
-                <!-- Update Ranking + Filter -->
-                <div class="flex gap-3 items-center">
-                    <button id="updateRanking"
-                        class="px-4 py-2 rounded-md text-sm font-medium bg-sky-600 text-white hover:bg-sky-700 transition-colors">
-                        Update Ranking
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Lihat Jawaban -->
-        <div id="answerModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden p-4 z-40">
-            <div class="bg-white rounded-lg p-6 max-w-lg w-full relative">
-                <h2 class="text-xl font-bold mb-3">Jawaban Peserta</h2>
-                <div id="answerContent" class="text-gray-800 max-h-96 overflow-y-auto border rounded p-3 text-sm"></div>
-
-                <button id="closeAnswerModal" class="mt-4 w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700">
-                    Tutup
-                </button>
-            </div>
-        </div>
-
-                <!-- Download + Delete -->
-                <div class="flex items-center gap-3 justify-end">
-                    <button id="downloadPassed"
-                        class="px-4 py-2 rounded-md text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors">
-                        Download Peserta Lulus
-                    </button>
-                    <button id="deleteAllBtn"
-                        class="px-4 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors">
-                        Hapus Semua Data
-                    </button>
-                </div>
-            </section>
-
-
-            <p id="quotaInfo" class="text-sm text-slate-500 mb-4">Kuota kursi saat ini: 150.</p>
-
-            <!-- Loading -->
-            <div id="loadingSpinner" class="hidden py-6 text-center">
-                <svg class="mx-auto h-8 w-8 animate-spin text-sky-500" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.15" stroke-width="4">
-                    </circle>
-                    <path d="M4 12a8 8 0 018-8v8H4z" fill="currentColor" class="opacity-75"></path>
-                </svg>
-                <div class="text-sm text-slate-500 mt-2">Memuat data peserta...</div>
-            </div>
-
-            <!-- Table & Mobile list -->
-            <div class="mt-3">
-                <div class="overflow-hidden rounded-xl border border-slate-100 bg-white">
-                    <!-- Desktop table -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full hidden sm:table text-sm">
-                            <thead class="bg-slate-50">
-                                <tr class="text-slate-600 text-left">
-                                    <th class="px-4 py-3">#</th>
-                                    <th class="px-4 py-3">Nama</th>
-                                    <th class="px-4 py-3">Email</th>
-                                    <th class="px-4 py-3">No. Telepon</th>
-                                    <th class="px-4 py-3">Organisasi</th>
-                                    <th class="px-4 py-3">Skor</th>
-                                    <th class="px-4 py-3">Integritas</th>
-                                    <th class="px-4 py-3">Ranking</th>
-                                    <th class="px-4 py-3">Status</th>
-                                    <th class="px-4 py-3 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dataTable" class="divide-y divide-slate-100 bg-white"></tbody>
-                        </table>
+        <!-- Controls -->
+        <section class="bg-white rounded-lg shadow p-6 border border-slate-200 mb-6">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-wrap items-center gap-4 justify-between">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium text-slate-700">Kuota Kursi</label>
+                        <div class="relative">
+                            <input id="quotaInput" type="number" min="1" value="150"
+                                class="w-28 px-3 py-2 rounded-md border border-slate-300" />
+                            <button id="saveQuota"
+                                class="absolute right-0 top-0 h-full bg-blue-600 text-white px-3 rounded-r-md">
+                                <span class="material-symbols-outlined">save</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Mobile list -->
-                    <div id="mobileList" class="sm:hidden p-4 space-y-3 bg-slate-50"></div>
-                </div>
-            </div>
-
-            <!-- Pagination & show limit -->
-            <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="flex items-center gap-2 text-sm text-slate-600">
-                    <label for="limitSelect" class="mr-1">Tampilkan</label>
-                    <select id="limitSelect" class="px-3 py-1 rounded-md border border-slate-200 text-sm bg-white">
-                        <option value="10">10</option>
-                        <option value="20" selected>20</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span>baris</span>
+                    <div class="flex items-center gap-3">
+                        <button id="updateRanking" class="bg-sky-600 text-white px-4 py-2 rounded-md">Update
+                            Ranking</button>
+                    </div>
                 </div>
 
-                <div id="paginationControls" class="flex gap-2 items-center"></div>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <select id="filterStatus" class="px-3 py-2 rounded-md border border-slate-300">
+                            <option value="ALL">Semua Status</option>
+                            <option value="LULUS">LULUS</option>
+                            <option value="TIDAK LOLOS">TIDAK LOLOS</option>
+                        </select>
+
+                        <button id="downloadPassed"
+                            class="bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center gap-2">
+                            <span class="material-symbols-outlined">download</span> Peserta Lulus
+                        </button>
+                    </div>
+
+                    <div>
+                        <button id="deleteAllBtn"
+                            class="bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2">
+                            <span class="material-symbols-outlined">delete</span> Hapus Semua Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <p id="quotaInfo" class="text-sm text-slate-500 mb-4">Kuota kursi saat ini: 150.</p>
+
+        <!-- Loading -->
+        <div id="loadingSpinner" class="hidden text-center py-6">
+            <svg class="mx-auto h-8 w-8 animate-spin text-sky-500" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.15" stroke-width="4"></circle>
+                <path d="M4 12a8 8 0 018-8v8H4z" fill="currentColor" class="opacity-75"></path>
+            </svg>
+            <div class="text-sm text-slate-500 mt-2">Memuat data peserta...</div>
+        </div>
+
+        <!-- Table & Mobile -->
+        <div class="overflow-hidden rounded-xl border border-slate-100 bg-white">
+            <div class="overflow-x-auto">
+                <table class="min-w-full hidden sm:table text-sm">
+                    <thead class="bg-slate-50">
+                        <tr class="text-slate-600 text-left">
+                            <th class="px-4 py-3">#</th>
+                            <th class="px-4 py-3">Nama</th>
+                            <th class="px-4 py-3">Email</th>
+                            <th class="px-4 py-3">No. Telepon</th>
+                            <th class="px-4 py-3">Organisasi</th>
+                            <th class="px-4 py-3">Skor</th>
+                            <th class="px-4 py-3">Integritas</th>
+                            <th class="px-4 py-3">Ranking</th>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable" class="divide-y divide-slate-100 bg-white"></tbody>
+                </table>
             </div>
 
-        </main>
+            <!-- mobile -->
+            <div id="mobileList" class="sm:hidden p-4 space-y-3 bg-slate-50"></div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-sm text-slate-600">
+                <label for="limitSelect" class="mr-1">Tampilkan</label>
+                <select id="limitSelect" class="px-3 py-1 rounded-md border border-slate-200 text-sm bg-white">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                </select>
+                <span>baris</span>
+            </div>
+
+            <div id="paginationControls" class="flex gap-2 items-center"></div>
+        </div>
+
     </div>
 
     <!-- ========== MODALS ========== -->
 
     <!-- QR Modal -->
-    <div id="qrModal"
-        class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop modal-backdrop modal-backdrop p-4">
+    <div id="qrModal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop p-4">
         <div class="max-w-sm w-full bg-white rounded-2xl p-5 shadow-lg">
             <h3 class="text-lg font-semibold mb-3">Scan QR untuk membuka kuesioner</h3>
-            <div class="flex justify-center mb-4">
-                <canvas id="qrCanvas" class="rounded-md bg-slate-50"></canvas>
-            </div>
+            <div class="flex justify-center mb-4"><canvas id="qrCanvas" class="rounded-md bg-slate-50"></canvas></div>
             <div class="flex gap-2">
                 <button id="downloadQrBtn" class="flex-1 px-3 py-2 rounded-md bg-sky-600 text-white">Download
                     QR</button>
-                <button id="closeQr" class="flex-1 px-3 py-2 rounded-md bg-red-600 text-white">Tutup</button>
+                <button id="closeQr" class="flex-1 px-3 py-2 rounded-md bg-rose-600 text-white">Tutup</button>
             </div>
         </div>
     </div>
 
-    <!-- Confirm Modal (Promise based) -->
+    <!-- Confirm Modal (Promise-based) -->
     <div id="confirmModal" class="fixed inset-0 z-50 hidden modal-backdrop p-4 flex items-center justify-center">
         <div class="w-full max-w-md bg-white rounded-2xl p-6 shadow-lg text-center">
             <p id="confirmText" class="text-slate-700 mb-4 text-base font-medium"></p>
@@ -254,37 +214,65 @@
         </div>
     </div>
 
-    <!--=========================
-        SCRIPT (keaslian fungsi dipertahankan)
-        ========================= -->
+    <!-- View Answers Modal -->
+    <div id="answerModal" class="fixed inset-0 z-50 hidden modal-backdrop p-4 flex items-center justify-center">
+        <div class="w-full max-w-2xl bg-white rounded-2xl p-6 shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Jawaban Peserta</h3>
+                <button id="closeAnswerModal" class="text-slate-500">Tutup</button>
+            </div>
+            <div id="answerContent" class="text-gray-800 max-h-72 overflow-y-auto border rounded p-3 text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Status edit modal -->
+    <div id="statusModal" class="fixed inset-0 z-50 hidden modal-backdrop p-4 flex items-center justify-center">
+        <div class="w-full max-w-sm bg-white rounded-2xl p-6 shadow-lg">
+            <h3 class="text-lg font-semibold mb-3 text-center">Ubah Status Peserta</h3>
+            <p id="statusModalName" class="text-sm text-slate-500 text-center mb-4"></p>
+
+            <select id="newStatus" class="w-full px-3 py-2 border border-slate-300 rounded-md mb-4">
+                <option value="LULUS">LULUS</option>
+                <option value="TIDAK LOLOS">TIDAK LOLOS</option>
+            </select>
+
+            <div class="flex gap-3">
+                <button id="confirmStatusBtn"
+                    class="flex-1 px-3 py-2 bg-emerald-600 text-white rounded-md">Simpan</button>
+                <button id="cancelStatusBtn"
+                    class="flex-1 px-3 py-2 bg-slate-300 text-slate-700 rounded-md">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPT ================= -->
     <script>
-        /* ========= global state ========= */
-        let currentPage = 1;
-        let limit = 20;
-        let currentFilter = "ALL";
+        /* ========= state ========= */
+        let currentPage = 1, limit = 20, currentFilter = "ALL";
         const questionnaireUrl = window.location.origin;
 
         /* ========= elements ========= */
         const qrModal = document.getElementById('qrModal');
         const qrCanvas = document.getElementById('qrCanvas');
         const toggleOpenBtn = document.getElementById('toggleOpenBtn');
-        const toggleOpenIcon = document.getElementById('toggleOpenIcon');
-        const loadingSpinner = document.getElementById('loadingSpinner'); // still exists in markup
+        const loadingSpinner = document.getElementById('loadingSpinner');
         const confirmModal = document.getElementById('confirmModal');
         const confirmText = document.getElementById('confirmText');
+        const downloadChoiceModal = document.getElementById('downloadChoiceModal');
 
-        const downloadChoiceModal = document.getElementById("downloadChoiceModal");
+        const answerModal = document.getElementById('answerModal');
+        const answerContent = document.getElementById('answerContent');
+        const closeAnswerModal = document.getElementById('closeAnswerModal');
 
-        /* ========== small safety: ensure loadingSpinner exists ========== */
-        if (!loadingSpinner) {
-            // create a lightweight loading placeholder so existing code doesn't break
-            const el = document.createElement('div');
-            el.id = 'loadingSpinner';
-            el.className = 'hidden';
-            document.body.appendChild(el);
-        }
+        const statusModal = document.getElementById('statusModal');
+        const statusModalName = document.getElementById('statusModalName');
+        const newStatus = document.getElementById('newStatus');
+        const confirmStatusBtn = document.getElementById('confirmStatusBtn');
+        const cancelStatusBtn = document.getElementById('cancelStatusBtn');
 
-        /* ========= Promise-based confirm modal ========= */
+        let editingUserId = null;
+
+        /* ========= small helper: show confirm (promise) ========= */
         function showConfirm(message) {
             return new Promise(resolve => {
                 confirmText.textContent = message;
@@ -293,131 +281,86 @@
                 const yes = document.getElementById('confirmYes');
                 const no = document.getElementById('confirmNo');
 
-                const cleanup = () => {
-                    confirmModal.classList.add('hidden');
-                    // rebind buttons by cloning to remove previous listeners
-                    yes.replaceWith(yes.cloneNode(true));
-                    no.replaceWith(no.cloneNode(true));
-                };
+                // remove old listeners by cloning nodes
+                const yesClone = yes.cloneNode(true);
+                const noClone = no.cloneNode(true);
+                yes.replaceWith(yesClone);
+                no.replaceWith(noClone);
 
-                document.getElementById('confirmYes').addEventListener('click', () => {
-                    cleanup();
-                    resolve(true);
-                });
+                const cleanup = () => confirmModal.classList.add('hidden');
 
-                document.getElementById('confirmNo').addEventListener('click', () => {
-                    cleanup();
-                    resolve(false);
-                });
+                yesClone.addEventListener('click', () => { cleanup(); resolve(true); });
+                noClone.addEventListener('click', () => { cleanup(); resolve(false); });
             });
         }
 
-        /* ========= auth check + initial loads ========= */
+        /* ========= init: auth + loads ========= */
         (async () => {
             try {
                 const res = await fetch('api/check_auth.php');
                 const data = await res.json();
-                if (!data.authenticated) {
-                    location.href = 'login.html';
-                    return;
-                }
-            } catch (e) {
-                console.error('auth check failed', e);
-                location.href = 'login.html';
-                return;
-            }
+                if (!data.authenticated) { location.href = 'login.html'; return; }
+            } catch (e) { console.error('auth error', e); location.href = 'login.html'; return; }
 
             await loadQuota();
             await loadData();
             await loadOpenStatus();
         })();
 
-        /* ========= BUTTON BINDINGS ========= */
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            window.location.href = 'api/logout.php';
-        });
+        /* ========= bindings ========= */
+        document.getElementById('logoutBtn').addEventListener('click', () => location.href = 'api/logout.php');
 
         document.getElementById('shareLinkBtn').addEventListener('click', () => {
             if (navigator.clipboard?.writeText) {
-                navigator.clipboard.writeText(questionnaireUrl)
-                    .then(() => alert('Link kuesioner disalin ke clipboard!'))
+                navigator.clipboard.writeText(questionnaireUrl).then(() => alert('Link kuesioner disalin ke clipboard!'))
                     .catch(err => alert('Gagal menyalin link: ' + err));
-            } else {
-                prompt('Salin link kuesioner berikut:', questionnaireUrl);
-            }
+            } else prompt('Salin link kuesioner berikut:', questionnaireUrl);
         });
 
-        /* QR */
+        // QR
         document.getElementById('qrBtn').addEventListener('click', () => {
             try {
-                QRCode.toCanvas(qrCanvas, questionnaireUrl, { width: 200 }, function (error) {
-                    if (error) console.error(error);
+                QRCode.toCanvas(qrCanvas, questionnaireUrl, { width: 200 }, e => {
+                    if (e) console.error(e);
                     qrModal.classList.remove('hidden');
                 });
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         });
         document.getElementById('closeQr').addEventListener('click', () => qrModal.classList.add('hidden'));
         document.getElementById('downloadQrBtn').addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.href = qrCanvas.toDataURL("image/png");
-            link.download = "kuesioner_qr.png";
-            link.click();
+            const link = document.createElement('a'); link.href = qrCanvas.toDataURL('image/png'); link.download = 'kuesioner_qr.png'; link.click();
         });
 
-        /* ========= open/close kuesioner ========= */
+        // open/close kuesioner
         async function loadOpenStatus() {
             try {
-                const res = await fetch('api/open_question.php');
-                const data = await res.json();
+                const res = await fetch('api/open_question.php'); const data = await res.json();
                 updateOpenButton(data.is_open ?? 0);
-            } catch (e) {
-                toggleOpenBtn.textContent = 'Error';
-            }
+            } catch (e) { toggleOpenBtn.textContent = 'Error'; }
         }
         function updateOpenButton(status) {
             toggleOpenBtn.dataset.status = status;
-            toggleOpenBtn.textContent = status == 1 ? 'Tutup Kuesioner' : 'Buka Kuesioner';
-            toggleOpenBtn.innerHTML = '<span class="material-symbols-outlined" id="toggleOpenIcon">' +
-                (status == 1 ? 'lock' : 'lock_open_right') +
-                '</span>' + toggleOpenBtn.textContent;
-
+            toggleOpenBtn.innerHTML = '<span class="material-symbols-outlined">' + (status == 1 ? 'lock' : 'lock_open_right') + '</span> ' + (status == 1 ? 'Tutup Kuesioner' : 'Buka Kuesioner');
         }
         toggleOpenBtn.addEventListener('click', async () => {
             const newStatus = toggleOpenBtn.dataset.status == 1 ? 0 : 1;
             const ok = await showConfirm(`Apakah Anda yakin ingin ${newStatus ? 'membuka' : 'menutup'} kuesioner?`);
             if (!ok) return;
             try {
-                const res = await fetch('api/open_question.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ open: newStatus })
-                });
+                const res = await fetch('api/open_question.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ open: newStatus }) });
                 const data = await res.json();
-                if (data.success) {
-                    updateOpenButton(newStatus);
-                    alert(data.message || 'Status diperbarui.');
-                } else {
-                    alert(data.message || 'Gagal memperbarui status.');
-                }
-            } catch (e) {
-                console.error(e);
-                alert('Kesalahan saat memperbarui status.');
-            }
+                if (data.success) { updateOpenButton(newStatus); alert(data.message || 'Status diperbarui.'); }
+                else alert(data.message || 'Gagal memperbarui status.');
+            } catch (e) { console.error(e); alert('Kesalahan saat memperbarui status.'); }
         });
 
-        /* ========= quota ========= */
+        // quota
         async function loadQuota() {
             try {
-                const res = await fetch('api/get_quota.php');
-                const data = await res.json();
-                document.getElementById('quotaInput').value = data.quota;
-                document.getElementById('quotaInfo').textContent =
-                    `Kuota kursi saat ini: ${data.quota}. Peserta dengan ranking ≤ ${data.quota} dan integritas LULUS akan berstatus LULUS.`;
-            } catch (e) {
-                console.error('loadQuota', e);
-            }
+                const res = await fetch('api/get_quota.php'); const data = await res.json();
+                document.getElementById('quotaInput').value = data.quota ?? 150;
+                document.getElementById('quotaInfo').textContent = `Kuota kursi saat ini: ${data.quota ?? 150}. Peserta dengan ranking ≤ ${data.quota ?? 150} dan integritas LULUS akan berstatus LULUS.`;
+            } catch (e) { console.error('loadQuota', e); }
         }
 
         document.getElementById('saveQuota').addEventListener('click', async () => {
@@ -425,130 +368,97 @@
             const ok = await showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${newQuota}?`);
             if (!ok) return;
             try {
-                const res = await fetch('api/update_quota.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ quota: newQuota })
-                });
+                const res = await fetch('api/update_quota.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quota: newQuota }) });
                 const data = await res.json();
-                alert(`Kuota diperbarui menjadi ${data.quota}`);
-                await fetch('api/update_ranking.php');
-                await loadData();
-            } catch (e) {
-                console.error(e);
-                alert('Gagal memperbarui kuota.');
-            }
+                alert(`Kuota diperbarui menjadi ${data.quota ?? newQuota}`);
+                await fetch('api/update_ranking.php'); await loadData();
+            } catch (e) { console.error(e); alert('Gagal memperbarui kuota.'); }
         });
 
         document.getElementById('updateRanking').addEventListener('click', async () => {
             const ok = await showConfirm('Apakah yakin ingin memperbarui ranking peserta?');
             if (!ok) return;
-            await fetch('api/update_ranking.php');
-            await loadData();
+            await fetch('api/update_ranking.php'); await loadData();
         });
 
-        document.getElementById('filterStatus').addEventListener('change', e => {
-            currentFilter = e.target.value;
-            loadData(currentPage);
-        });
+        document.getElementById('filterStatus').addEventListener('change', e => { currentFilter = e.target.value; loadData(currentPage); });
+        document.getElementById('limitSelect').addEventListener('change', e => { limit = parseInt(e.target.value); currentPage = 1; loadData(currentPage); });
+        document.getElementById('downloadPassed').addEventListener('click', () => { window.location.href = 'api/export_selected.php'; });
 
-        document.getElementById('limitSelect').addEventListener('change', e => {
-            limit = parseInt(e.target.value);
-            currentPage = 1;
-            loadData(currentPage);
-        });
-
-        document.getElementById('downloadPassed').addEventListener('click', () => {
-            window.location.href = 'api/export_selected.php';
-        });
-
-        /* ========= loadData (responsive version) ========= */
+        /* ========= loadData (responsive) ========= */
         async function loadData(page = 1) {
-            // show spinner
-            const spinner = document.getElementById('loadingSpinner');
-            spinner && spinner.classList.remove('hidden');
+            const spinner = document.getElementById('loadingSpinner'); spinner && spinner.classList.remove('hidden');
 
             try {
                 const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
                 const result = await res.json();
 
-                const filtered = result.data.filter(item =>
-                    currentFilter === "ALL" ? true : item.status === currentFilter
-                );
+                const filtered = (result.data || []).filter(item => currentFilter === "ALL" ? true : (item.status ?? '').toUpperCase() === currentFilter);
 
                 const tbody = document.getElementById('dataTable');
                 const mobileList = document.getElementById('mobileList');
+                tbody.innerHTML = ''; mobileList.innerHTML = '';
 
-                tbody.innerHTML = '';
-                mobileList.innerHTML = '';
+                filtered.forEach(item => {
+                    const safeStatus = item.status ?? '-';
+                    const safePhone = item.phone ?? '-';
+                    const safeOrg = item.organization ?? '-';
+                    const ranking = item.ranking ?? '-';
 
-                filtered.forEach((item) => {
                     // desktop row
                     const row = document.createElement('tr');
                     row.className = 'text-slate-700';
-
                     row.innerHTML = `
-            <td class="px-4 py-3">${item.ranking}</td>
-            <td class="px-4 py-3">${item.name}</td>
-            <td class="px-4 py-3">${item.email}</td>
-            <td class="px-4 py-3">${item.phone ?? '-'}</td>
-            <td class="px-4 py-3">${item.organization ?? '-'}</td>
-            <td class="px-4 py-3">${item.core_score}</td>
-            <td class="px-4 py-3 ${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">
-                ${item.integrity_status}
-            </td>
-            <td class="border px-2 py-1">${item.ranking}</td>
-            <td class="border px-2 py-1">${item.status}</td>
-            <td class="border px-2 py-1">
-                <button class="text-blue-600 view-answer-btn" data-id="${item.user_id}">
-                    Lihat
-                </button>
-                <button class="text-red-600 delete-row-btn" data-id="${item.user_id}">
-                    Hapus
-                </button>
-            </td>
-            `;
-                tbody.appendChild(row);
+                        <td class="px-4 py-3">${ranking}</td>
+                        <td class="px-4 py-3">${escapeHtml(item.name)}</td>
+                        <td class="px-4 py-3">${escapeHtml(item.email)}</td>
+                        <td class="px-4 py-3">${escapeHtml(safePhone)}</td>
+                        <td class="px-4 py-3">${escapeHtml(safeOrg)}</td>
+                        <td class="px-4 py-3">${item.core_score ?? '-'}</td>
+                        <td class="px-4 py-3 ${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status ?? '-'}</td>
+                        <td class="px-4 py-3">${ranking}</td>
+                        <td class="px-4 py-3">${escapeHtml(safeStatus)}</td>
+                        <td class="px-4 py-3">
+                            <button class="text-blue-600 view-answer-btn" data-id="${item.user_id}">Lihat</button>
+                            <button class="text-amber-600 edit-status-btn ml-3" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button>
+                            <button class="text-red-600 delete-row-btn ml-3" data-id="${item.id}">Hapus</button>
+                        </td>
+                        `;
+                    tbody.appendChild(row);
 
                     // mobile card
                     const card = document.createElement('div');
                     card.className = 'bg-white rounded-xl p-4 shadow-sm sm:hidden';
                     card.innerHTML = `
-            <div class="flex justify-between items-start gap-3">
-                <div>
-                    <div class="text-base font-semibold text-slate-800">${item.name}</div>
-                    <div class="text-xs mt-1 text-slate-500">${item.email}</div>
-                </div>
-                <div class="text-right">
-                    <div class="text-xs text-slate-500">Rank</div>
-                    <div class="text-sm font-medium text-slate-700">${item.ranking}</div>
-                </div>
+            <div class="flex justify-between">
+              <div>
+                <div class="font-semibold">${escapeHtml(item.name)}</div>
+                <div class="text-xs text-slate-500">${escapeHtml(item.email)}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-slate-500">Rank</div>
+                <div class="text-sm font-medium">${ranking}</div>
+              </div>
             </div>
 
             <div class="mt-3 text-sm text-slate-600 space-y-1">
-                <div><span class="font-medium">Telepon:</span> ${item.phone ?? '-'}</div>
-                <div><span class="font-medium">Organisasi:</span> ${item.organization ?? '-'}</div>
-                <div><span class="font-medium">Skor:</span> ${item.core_score}</div>
-                <div><span class="font-medium">Integritas:</span> <span class="${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status}</span></div>
-                <div><span class="font-medium">Status:</span> ${item.status}</div>
+              <div><strong>Telepon:</strong> ${escapeHtml(safePhone)}</div>
+              <div><strong>Organisasi:</strong> ${escapeHtml(safeOrg)}</div>
+              <div><strong>Skor:</strong> ${item.core_score ?? '-'}</div>
+              <div><strong>Integritas:</strong> <span class="${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status ?? '-'}</span></div>
+              <div><strong>Status:</strong> ${escapeHtml(safeStatus)}</div>
             </div>
 
-            <button 
-                class="mt-3 w-full bg-blue-600 text-white py-1 rounded view-answer-btn" 
-                data-id="${item.user_id}">
-                Lihat Jawaban
-            </button>
-            <button 
-                class="mt-2 w-full bg-red-600 text-white py-1 rounded delete-row-btn" 
-                data-id="${item.user_id}">
-                Hapus
-            </button>
-            `;
+            <div class="mt-3 space-y-2">
+              <button class="w-full bg-blue-600 text-white py-2 rounded view-answer-btn" data-id="${item.user_id}">Lihat Jawaban</button>
+              <button class="w-full bg-amber-600 text-white py-2 rounded edit-status-btn" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button>
+              <button class="w-full bg-rose-600 text-white py-2 rounded delete-row-btn" data-id="${item.id}">Hapus</button>
+            </div>
+          `;
+                    mobileList.appendChild(card);
+                });
 
-                mobileList.appendChild(card);
-            });
-
-                renderPagination(result.page, result.totalPages);
+                renderPagination(result.page || 1, result.totalPages || 1);
             } catch (e) {
                 console.error('loadData error', e);
                 alert('Gagal memuat data. Cek koneksi atau API.');
@@ -558,34 +468,25 @@
         }
 
         /* ========= delete one ========= */
-        document.addEventListener('click', async (ev) => {
+        document.addEventListener('click', async ev => {
             const t = ev.target;
             if (!t.classList.contains('delete-row-btn')) return;
             const id = t.dataset.id;
             const ok = await showConfirm('Hapus peserta ini?');
             if (!ok) return;
             try {
-                const res = await fetch('api/delete_one.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id })
-                });
+                const res = await fetch('api/delete_one.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
                 const data = await res.json();
-                if (data.success) await loadData(currentPage);
-                else alert(data.message || 'Gagal menghapus.');
-            } catch (e) {
-                console.error(e);
-                alert('Gagal menghapus data.');
-            }
+                if (data.success) await loadData(currentPage); else alert(data.message || 'Gagal menghapus.');
+            } catch (e) { console.error(e); alert('Gagal menghapus data.'); }
         });
 
-        /* ========= delete all (3-step) ========= */
+        /* ========= delete all ========= */
         document.getElementById('deleteAllBtn').addEventListener('click', async () => {
             const ok1 = await showConfirm('Yakin ingin menghapus SEMUA data peserta?');
             if (!ok1) return;
 
             downloadChoiceModal.classList.remove('hidden');
-
             const closeModal = () => downloadChoiceModal.classList.add('hidden');
 
             document.getElementById('dlPassedBtn').onclick = async () => {
@@ -600,9 +501,7 @@
                 closeModal();
                 await doFinalDelete();
             };
-            document.getElementById('cancelDlChoice').onclick = () => {
-                closeModal();
-            };
+            document.getElementById('cancelDlChoice').onclick = () => { closeModal(); };
         });
 
         async function finalDeleteConfirm() {
@@ -616,23 +515,14 @@
             try {
                 const res = await fetch('api/delete_all.php', { method: 'POST' });
                 const data = await res.json();
-                if (data.success) {
-                    alert('Semua data telah dihapus.');
-                    await loadData(1);
-                } else {
-                    alert(data.message || 'Gagal menghapus semua data.');
-                }
-            } catch (e) {
-                console.error(e);
-                alert('Gagal menghapus semua data.');
-            }
+                if (data.success) { alert('Semua data telah dihapus.'); await loadData(1); }
+                else alert(data.message || 'Gagal menghapus semua data.');
+            } catch (e) { console.error(e); alert('Gagal menghapus semua data.'); }
         }
 
-        /* ========= pagination rendering ========= */
+        /* ========= pagination ========= */
         function renderPagination(page, totalPages) {
-            const container = document.getElementById('paginationControls');
-            container.innerHTML = '';
-
+            const container = document.getElementById('paginationControls'); container.innerHTML = '';
             const makeBtn = (label, pg, disabled = false, active = false) => {
                 const btn = document.createElement('button');
                 btn.textContent = label;
@@ -641,57 +531,67 @@
                 if (disabled) btn.classList.add('opacity-50', 'cursor-not-allowed');
                 return btn;
             };
-
             container.appendChild(makeBtn('Prev', page - 1, page <= 1));
             const range = 2;
-            const start = Math.max(1, page - range);
-            const end = Math.min(totalPages, page + range);
-            for (let i = start; i <= end; i++) {
-                container.appendChild(makeBtn(i, i, false, i === page));
-            }
+            const start = Math.max(1, page - range); const end = Math.min(totalPages, page + range);
+            for (let i = start; i <= end; i++) container.appendChild(makeBtn(i, i, false, i === page));
             container.appendChild(makeBtn('Next', page + 1, page >= totalPages));
             currentPage = page;
         }
 
-        // Modal elemen
-        const answerModal = document.getElementById("answerModal");
-        const answerContent = document.getElementById("answerContent");
-        const closeAnswerModal = document.getElementById("closeAnswerModal");
-
-        // Tutup modal
-        closeAnswerModal.addEventListener("click", () => {
-            answerModal.classList.add("hidden");
-        });
-
-        // Event untuk tombol LIHAT
-        document.addEventListener("click", async (e) => {
-            if (!e.target.classList.contains("view-answer-btn")) return;
-
+        /* ========= view answers ========= */
+        document.addEventListener('click', async e => {
+            if (!e.target.classList.contains('view-answer-btn')) return;
             const userId = e.target.dataset.id;
+            try {
+                const res = await fetch('api/get_user_answers.php?id=' + encodeURIComponent(userId));
+                const data = await res.json();
+                if (!data.success) { alert('Gagal memuat jawaban.'); return; }
+                let html = '';
+                (data.answers || []).forEach((a, i) => {
+                    html += `<div class="mb-3"><p class="font-medium">${i + 1}. ${escapeHtml(a.question)}</p><p class="text-blue-700 font-semibold">${escapeHtml(a.answer_text)}</p></div>`;
+                });
+                answerContent && (answerContent.innerHTML = html || '<div class="text-sm text-slate-500">Tidak ada jawaban.</div>');
+                answerModal.classList.remove('hidden');
+            } catch (e) { console.error(e); alert('Gagal memuat jawaban.'); }
+        });
+        closeAnswerModal && closeAnswerModal.addEventListener('click', () => answerModal.classList.add('hidden'));
 
-            const res = await fetch("api/get_user_answers.php?id=" + userId);
-            const data = await res.json();
-
-            if (!data.success) {
-                alert("Gagal memuat jawaban.");
-                return;
-            }
-
-            // Format tampilan jawaban
-            let html = "";
-            data.answers.forEach((a, i) => {
-                html += `
-            <div class="mb-3">
-                <p class="font-medium">${i + 1}. ${a.question}</p>
-                <p class="text-blue-700 font-semibold">${a.answer_text}</p>
-            </div>
-        `;
-            });
-
-            answerContent.innerHTML = html;
-            answerModal.classList.remove("hidden");
+        /* ========= edit status (open modal) ========= */
+        document.addEventListener('click', e => {
+            if (!e.target.classList.contains('edit-status-btn')) return;
+            // in table we used item.id as scores.id; pass that to API
+            editingUserId = e.target.dataset.id;
+            const currentStatus = e.target.dataset.status || '-';
+            newStatus.value = currentStatus === 'TIDAK LOLOS' ? 'TIDAK LOLOS' : 'LULUS';
+            statusModalName.textContent = `Status saat ini: ${currentStatus}`;
+            statusModal.classList.remove('hidden');
         });
 
+        cancelStatusBtn.addEventListener('click', () => statusModal.classList.add('hidden'));
+
+        confirmStatusBtn.addEventListener('click', async () => {
+            const selectedStatus = newStatus.value;
+            // hide status modal first, small delay to allow DOM update so confirm modal is on top
+            statusModal.classList.add('hidden');
+            await new Promise(r => setTimeout(r, 150));
+
+            const ok = await showConfirm(`Ubah status peserta menjadi ${selectedStatus}?`);
+            if (!ok) return;
+
+            try {
+                const res = await fetch('api/update_status.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingUserId, status: selectedStatus }) });
+                const data = await res.json();
+                if (data.success) { alert('Status berhasil diperbarui.'); await loadData(currentPage); }
+                else alert(data.message || 'Gagal memperbarui status.');
+            } catch (e) { console.error(e); alert('Terjadi kesalahan.'); }
+        });
+
+        /* ========= small util ========= */
+        function escapeHtml(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]; });
+        }
     </script>
 </body>
 
