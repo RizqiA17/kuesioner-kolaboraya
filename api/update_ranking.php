@@ -28,22 +28,37 @@ foreach ($results as $r) {
     $stmt->execute([':r' => $rank++, ':id' => $r['id']]);
 }
 
-// Update status otomatis HANYA untuk peserta tanpa override
+// Hitung jumlah peserta manual LULUS
+$manual_count = $pdo->query("
+    SELECT COUNT(*) FROM scores 
+    WHERE manual_override = 'YES' AND manual_status = 'LULUS'
+")->fetchColumn();
+
+$effective_quota = max(0, $quota - $manual_count);
+
+// 1) Reset semua peserta non-manual ke TIDAK LOLOS (tanpa mengubah manual)
+$pdo->exec("
+    UPDATE scores
+    SET status = 'TIDAK LOLOS'
+    WHERE manual_override = 'NO'
+");
+
+// 2) Tetapkan LULUS untuk top N non-manual berdasarkan core_score, hanya yang integrity LULUS
+//    Catatan: gunakan subquery LIMIT untuk memilih id yang masuk kuota efektif
 $stmt = $pdo->prepare("
     UPDATE scores s
     JOIN (
-        SELECT id,
-            CASE
-                WHEN manual_override = 'YES' THEN manual_status
-                WHEN integrity_status = 'LULUS' AND ranking <= :q 
-                THEN 'LULUS'
-                ELSE 'TIDAK LOLOS'
-            END AS final_status
+        SELECT id
         FROM scores
-    ) x ON s.id = x.id
-    SET s.status = x.final_status
+        WHERE manual_override = 'NO'
+            AND integrity_status = 'LULUS'
+        ORDER BY core_score DESC, created_at ASC
+        LIMIT :q
+    ) sel ON s.id = sel.id
+    SET s.status = 'LULUS'
 ");
-$stmt->execute([':q' => $quota]);
+$stmt->bindValue(':q', (int)$effective_quota, PDO::PARAM_INT);
+$stmt->execute();
 
 // Ambil data terbaru
 $updated = $pdo->query("

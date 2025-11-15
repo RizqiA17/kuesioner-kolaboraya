@@ -1,2 +1,6 @@
 /cache/
 /config/development/
+/vendor/**/*
+email_log.txt
+*.log
+/api/email_config.php

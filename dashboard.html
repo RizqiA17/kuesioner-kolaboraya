@@ -87,10 +87,18 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 flex-wrap">
                         <button id="updateRanking" class="bg-sky-600 text-white px-4 py-2 rounded-md">Update
                             Ranking</button>
+                        <button id="sendEmailAllBtn"
+                            class="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined">
+                                mail
+                            </span>
+                            Kirim Email Lolos
+                        </button>
                     </div>
+
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -393,7 +401,18 @@
                 const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
                 const result = await res.json();
 
-                const filtered = (result.data || []).filter(item => currentFilter === "ALL" ? true : (item.status ?? '').toUpperCase() === currentFilter);
+                const filtered = (result.data || [])
+                    .filter(item => currentFilter === "ALL" ? true : (item.status ?? '').toUpperCase() === currentFilter)
+                    .sort((a, b) => {
+                        // kalau filter LULUS, urutkan manual LULUS setelah otomatis
+                        if (currentFilter === "LULUS") {
+                            // manual override YES taruh di belakang otomatis
+                            if (a.manual_override === "YES" && b.manual_override === "NO") return 1;
+                            if (a.manual_override === "NO" && b.manual_override === "YES") return -1;
+                        }
+                        return (a.ranking ?? 9999) - (b.ranking ?? 9999);
+                    });
+
 
                 const tbody = document.getElementById('dataTable');
                 const mobileList = document.getElementById('mobileList');
@@ -421,6 +440,9 @@
                         <td class="px-4 py-3">
                             <button class="text-blue-600 view-answer-btn" data-id="${item.user_id}">Lihat</button>
                             <button class="text-amber-600 edit-status-btn ml-3" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button>
+                            <button class="text-purple-600 send-email-btn" data-id="${item.user_id}">
+                                Email
+                            </button>
                             <button class="text-red-600 delete-row-btn ml-3" data-id="${item.id}">Hapus</button>
                         </td>
                         `;
@@ -592,6 +614,35 @@
             if (s === null || s === undefined) return '';
             return String(s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]; });
         }
+
+        document.getElementById("sendEmailAllBtn").addEventListener("click", async () => {
+            const ok = await showConfirm("Kirim email ke SEMUA peserta yang LULUS?");
+            if (!ok) return;
+
+            const res = await fetch("api/send_email.php");
+            const data = await res.json();
+
+            alert(data.message);
+        });
+
+        document.addEventListener("click", async (e) => {
+            if (!e.target.classList.contains("send-email-btn")) return;
+
+            const id = e.target.dataset.id;
+
+            const ok = await showConfirm("Kirim email ke peserta ini?");
+            if (!ok) return;
+
+            const res = await fetch("api/send_email_single.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: id })
+            });
+
+            const data = await res.json();
+            alert(data.message);
+        });
+
     </script>
 </body>
 
