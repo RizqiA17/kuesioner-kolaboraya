@@ -620,7 +620,7 @@
             const makeBtn = (label, pg, disabled = false, active = false) => {
                 const btn = document.createElement('button');
                 btn.textContent = label;
-                btn.className = 'px-3 py-1 rounded-full text-sm transition-colors duration-300' + (active ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-sky-200 active:bg-sky-700 active:text-white');
+                btn.className = 'px-3 py-1 rounded-full text-sm transition-colors duration-300 ' + (active ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-sky-200 active:bg-sky-700 active:text-white');
                 if (!disabled && !active) btn.addEventListener('click', () => loadData(pg));
                 if (disabled) btn.classList.add('opacity-50', 'cursor-not-allowed');
                 return btn;
