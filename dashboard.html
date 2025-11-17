@@ -26,6 +26,7 @@
 
         .modal-backdrop {
             backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.2);
             -webkit-backdrop-filter: blur(4px);
         }
 
@@ -141,7 +142,7 @@
 
                     <div class="max-sm:flex-grow">
                         <button id="deleteAllBtn"
-                            class="flex items-center gap-2 border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700 max-sm:hidden action-btn logoutBtn">
+                            class="flex items-center gap-2 border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700 max-sm:hidden action-btn">
                             <span class="material-symbols-outlined">delete</span>
                             Semua Data
                         </button>
@@ -218,7 +219,8 @@
             <div class="flex items-center gap-2 text-sm text-slate-600 px-4 py-2 bg-white">
                 <label for="" class="mr-1">Tampilkan</label>
                 <div class="relative w-fit">
-                    <select id="limitSelect" class="pl-3 py-1 appearance-none pr-10 rounded-md border border-slate-200 text-sm bg-white focus-visible:outline-sky-500">
+                    <select id="limitSelect"
+                        class="pl-3 py-1 appearance-none pr-10 rounded-md border border-slate-200 text-sm bg-white focus-visible:outline-sky-500">
                         <option value="10">10</option>
                         <option value="20" selected>20</option>
                         <option value="50">50</option>
@@ -240,48 +242,59 @@
 
     <!-- QR Modal -->
     <div id="qrModal" class="fixed inset-0 z-40 hidden flex items-center justify-center modal-backdrop p-4">
-        <div class="max-w-sm w-full bg-white rounded-2xl p-5 shadow-lg">
+        <div class="max-w-sm w-full bg-white rounded-xl p-5 shadow-lg">
             <h3 class="text-lg font-semibold mb-3">Scan QR untuk membuka kuesioner</h3>
             <div class="flex justify-center mb-4"><canvas id="qrCanvas" class="rounded-md bg-slate-50"></canvas></div>
             <div class="flex gap-2">
-                <button id="downloadQrBtn" class="flex-1 px-3 py-2 rounded-md bg-sky-600 text-white">Download
+                <button id="downloadQrBtn"
+                    class="flex-1 px-3 py-2 rounded-md max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700">Download
                     QR</button>
-                <button id="closeQr" class="flex-1 px-3 py-2 rounded-md bg-rose-600 text-white">Tutup</button>
+                <button id="closeQr"
+                    class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Tutup</button>
             </div>
         </div>
     </div>
 
     <!-- Confirm Modal (Promise-based) -->
     <div id="confirmModal" class="fixed inset-0 z-50 hidden modal-backdrop p-4 flex items-center justify-center">
-        <div class="w-full max-w-md bg-white rounded-2xl p-6 shadow-lg text-center">
+        <div class="w-full max-w-md bg-white rounded-xl p-6 shadow-lg text-center">
             <p id="confirmText" class="text-slate-700 mb-4 text-base font-medium"></p>
             <div class="flex gap-3 justify-center">
-                <button id="confirmYes" class="px-4 py-2 rounded-md bg-emerald-600 text-white">Ya</button>
-                <button id="confirmNo" class="px-4 py-2 rounded-md bg-rose-500 text-white">Batal</button>
+                <button id="confirmYes"
+                    class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Ya</button>
+                <button id="confirmNo"
+                    class="flex items-center gap-2 py-2 px-4 rounded-md border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700">Batal</button>
             </div>
         </div>
     </div>
 
     <!-- Download choice modal (step 2) -->
     <div id="downloadChoiceModal" class="fixed inset-0 z-50 hidden modal-backdrop p-4 flex items-center justify-center">
-        <div class="w-full max-w-sm bg-white rounded-2xl p-6 shadow-lg text-center">
+        <div class="w-full max-w-sm bg-white rounded-xl p-6 shadow-lg text-center">
             <h3 class="text-lg font-semibold mb-2">Hapus Semua Data</h3>
             <p class="text-sm text-slate-500 mb-4">Pilih salah satu tindakan sebelum menghapus seluruh data.</p>
 
             <div class="flex flex-col gap-3">
-                <button id="dlPassedBtn" class="px-4 py-2 rounded-md bg-green-600 text-white">Download Data
+                <button id="dlPassedBtn"
+                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Download
+                    Data
                     Lulus</button>
-                <button id="dlAllBtn" class="px-4 py-2 rounded-md bg-sky-600 text-white">Download Semua Data</button>
-                <button id="deleteDirectBtn" class="px-4 py-2 rounded-md bg-rose-600 text-white">Hapus Tanpa
+                <button id="dlAllBtn"
+                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Download
+                    Semua Data</button>
+                <button id="deleteDirectBtn"
+                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-red-700">Hapus
+                    Tanpa
                     Download</button>
-                <button id="cancelDlChoice" class="px-4 py-2 rounded-md bg-slate-200 text-slate-700">Batal</button>
+                <button id="cancelDlChoice"
+                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-gray-200">Batal</button>
             </div>
         </div>
     </div>
 
     <!-- View Answers Modal -->
     <div id="answerModal" class="fixed inset-0 z-50 hidden modal-backdrop p-4 flex items-center justify-center">
-        <div class="w-full max-w-2xl bg-white rounded-2xl p-6 shadow-lg">
+        <div class="w-full max-w-2xl bg-white rounded-xl p-6 shadow-lg">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold">Jawaban Peserta</h3>
                 <button id="closeAnswerModal" class="text-slate-500">Tutup</button>
@@ -292,7 +305,7 @@
 
     <!-- Status edit modal -->
     <div id="statusModal" class="fixed inset-0 z-50 hidden modal-backdrop p-4 flex items-center justify-center">
-        <div class="w-full max-w-sm bg-white rounded-2xl p-6 shadow-lg">
+        <div class="w-full max-w-sm bg-white rounded-xl p-6 shadow-lg">
             <h3 class="text-lg font-semibold mb-3 text-center">Ubah Status Peserta</h3>
             <p id="statusModalName" class="text-sm text-slate-500 text-center mb-4"></p>
 
@@ -412,7 +425,7 @@
         function updateOpenButton(status) {
             toggleOpenBtn.forEach(element => {
                 isMobile = element.getAttribute('data-mobile') == 'true';
-                console.log(isMobile);
+                // console.log(isMobile);
                 element.dataset.status = status;
                 element.innerHTML = '<span class="material-symbols-outlined">' + (status == 1 ? 'lock' : 'lock_open_right') + '</span> ' + (isMobile ? '' : (status == 1 ? 'Tutup' : 'Buka') + ' Kuesioner');
             });
@@ -476,7 +489,7 @@
                     .sort((a, b) => {
                         // kalau filter LULUS, urutkan manual LULUS setelah otomatis
                         if (currentFilter === "LULUS") {
-                            console.log(a);
+                            // console.log(a);
                             // manual override YES taruh di belakang otomatis
                             if (a.manual_override === "YES" && b.manual_override === "NO") return 1;
                             if (a.manual_override === "NO" && b.manual_override === "YES") return -1;
@@ -508,13 +521,13 @@
                         <td class="px-4 py-3 ${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status ?? '-'}</td>
                         <td class="px-4 py-3">${ranking}</td>
                         <td class="px-4 py-3">${escapeHtml(safeStatus)}</td>
-                        <td class="px-4 py-3">
-                            <button class="text-blue-600 view-answer-btn" data-id="${item.user_id}">Lihat</button>
-                            <!-- <button class="text-amber-600 edit-status-btn ml-3" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button> -->
-                            <button class="text-purple-600 send-email-btn" data-id="${item.user_id}">
+                        <td class="px-4 py-3 flex flex-wrap gap-3 items-center justify-center">
+                            <button class="text-emerald-500 hover:text-emerald-600 active:text-emerald-700 view-answer-btn" data-id="${item.user_id}">Lihat</button>
+                            <!-- <button class="text-amber-500 edit-status-btn"data-id="${item.d}" data-status="${escapeHtml(safeStatus)}">Edit Status</button> -->
+                            <button class="text-blue-500 hover:text-blue-600 active:text-blue-700 send-email-btn" data-id="${item.user_id}">
                                 Email
                             </button>
-                            <button class="text-red-600 delete-row-btn ml-3" data-id="${item.id}">Hapus</button>
+                            <button class="text-red-500 hover:text-red-600 active:text-red-700 delete-row-btn" data-id="${item.id}">Hapus</button>
                         </td>
                         `;
                     tbody.appendChild(row);
@@ -543,10 +556,10 @@
                         </div>
                     
                         <div class="mt-3 space-y-2">
-                            <button class="w-full bg-blue-600 text-white py-2 rounded view-answer-btn" data-id="${item.user_id}">Lihat Jawaban</button>
+                            <button class="w-full px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700 view-answer-btn" data-id="${item.user_id}">Lihat Jawaban</button>
                             <!-- <button class="w-full bg-amber-600 text-white py-2 rounded edit-status-btn" data-id="${item.id}" data-status="${escapeHtml(safeStatus)}">Edit Status</button> -->
-                            <button class="w-full bg-purple-600 text-white py-2 rounded send-email-btn" data-id="${item.user_id}">Email</button>
-                            <button class="w-full bg-rose-600 text-white py-2 rounded delete-row-btn" data-id="${item.id}">Hapus</button>
+                            <button class="w-full px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700 send-email-btn" data-id="${item.user_id}">Email</button>
+                            <button class="w-full px-4 py-2 border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700 rounded-md delete-row-btn" data-id="${item.id}">Hapus</button>
                         </div>
                         `;
                     mobileList.appendChild(card);
@@ -643,7 +656,32 @@
                 if (!data.success) { alert('Gagal memuat jawaban.'); return; }
                 let html = '';
                 (data.answers || []).forEach((a, i) => {
-                    html += `<div class="mb-3"><p class="font-medium">${i + 1}. ${escapeHtml(a.question)}</p><p class="text-blue-700 font-semibold">${escapeHtml(a.answer_text)}</p></div>`;
+                    answerColor = "text-gray-500";
+                    switch (a.answer_text) {
+                        case "Sangat Setuju":
+                            answerColor = a.reversed == '1' ? "text-red-600" : "text-green-600";
+                            break;
+                        case "Setuju":
+                            answerColor = a.reversed == '1' ? "text-orange-600" : "text-lime-600";
+                            break;
+                        case "Netral":
+                            answerColor = "text-yellow-600";
+                            break;
+                        case "Tidak Setuju":
+                            answerColor = a.reversed == '1' ? "text-lime-600" : "text-orange-600";
+                            break;
+                        case "Sangat Tidak Setuju":
+                            answerColor = a.reversed == '1' ? "text-green-600" : "text-red-600";
+                            break;
+                    }
+                    html += `<div class="mb-3">
+                                <div class="flex gap-2">${i + 1}.
+                                    <div>
+                                    <p class="font-medium">${escapeHtml(a.question)}</p>
+                                    <p class="${answerColor} font-semibold">${escapeHtml(a.answer_text)}</p>
+                                    </div>
+                                </div>
+                            </div>`;
                 });
                 answerContent && (answerContent.innerHTML = html || '<div class="text-sm text-slate-500">Tidak ada jawaban.</div>');
                 answerModal.classList.remove('hidden');

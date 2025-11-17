@@ -18,7 +18,7 @@ if (!$response) {
 }
 
 // Ambil semua pertanyaan (agar bisa dicocokkan dengan q1..q15)
-$q = $pdo->query("SELECT id, question_text FROM questions ORDER BY id ASC");
+$q = $pdo->query("SELECT id, question_text, reversed FROM questions ORDER BY id ASC");
 $questions = $q->fetchAll(PDO::FETCH_ASSOC);
 
 // Label Likert
@@ -44,7 +44,8 @@ foreach ($questions as $row) {
         "question_id" => $qid,
         "question" => $row['question_text'],
         "value" => $value,
-        "answer_text" => $labels[$value] ?? "Tidak Diketahui"
+        "answer_text" => $labels[$value] ?? "Tidak Diketahui",
+        "reversed" => $row['reversed']
     ];
 }
 
