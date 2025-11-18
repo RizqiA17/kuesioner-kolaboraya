@@ -66,7 +66,8 @@ foreach ($rows as $r) {
         'core_score' => (int)$r['core_score'],
         'integrity_status' => $r['integrity_status'],
         'ranking' => (int)$r['ranking'],
-        'status' => $finalStatus     // status sudah bersih, tidak undefined
+        'status' => $finalStatus,
+        'manual_override' => $r['manual_override']
     ];
 }
 

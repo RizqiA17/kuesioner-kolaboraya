@@ -4,3 +4,5 @@
 email_log.txt
 *.log
 /api/email_config.php
+/assets/output.css
+/assets/styles.css

@@ -9,7 +9,11 @@ $stmt = $pdo->query("
     SELECT u.email, u.name 
     FROM scores s 
     JOIN users u ON u.id = s.user_id
-    WHERE s.status = 'LULUS'
+    WHERE (
+        s.status = 'LULUS' AND s.manual_override = 'NO'
+    ) OR (
+        s.manual_override = 'YES' AND s.manual_status = 'LULUS'
+    )
 ");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
