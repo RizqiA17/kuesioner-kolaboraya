@@ -63,6 +63,13 @@
                 <p class="mt-1 text-sm text-gray-500">*isi strip (-) jika tidak ada</p>
             </div>
 
+            <div>
+                <label class="block mb-1 font-medium text-gray-700">Alamat Kantor</label>
+                <textarea name="office_address" conte
+                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                <p class="mt-1 text-sm text-gray-500">*isi strip (-) jika tidak ada</p>
+            </div>
+
             <div id="questionList">
                 <p class="py-10 text-center text-gray-500">Memuat pertanyaan...</p>
             </div>
@@ -135,6 +142,7 @@
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 organization: formData.get('organization'),
+                office_address: formData.get('office_address'),
                 answers: answers
             };
 

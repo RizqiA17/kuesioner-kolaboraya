@@ -9,12 +9,13 @@ $name = trim($data['name']);
 $email = trim($data['email']);
 $phone = trim($data['phone']);
 $organization = trim($data['organization']);
+$office_address = trim($data['office_address']);
 
 $answers = $data['answers'] ?? [];
 
 // === Simpan User ===
-$stmt = $pdo->prepare("INSERT INTO users (name, email, phone, organization) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), phone = VALUES(phone), organization = VALUES(organization)");
-$stmt->execute([$name, $email, $phone, $organization]);
+$stmt = $pdo->prepare("INSERT INTO users (name, email, phone, organization, office_address) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), phone = VALUES(phone), organization = VALUES(organization), office_address = VALUES(office_address)");
+$stmt->execute([$name, $email, $phone, $organization, $office_address]);
 $userId = $pdo->lastInsertId();
 if (!$userId) {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");

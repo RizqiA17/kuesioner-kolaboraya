@@ -258,6 +258,9 @@ ALTER TABLE scores
 ADD COLUMN manual_override ENUM('YES','NO') DEFAULT 'NO',
 ADD COLUMN manual_status ENUM('LULUS','TIDAK LOLOS') DEFAULT NULL;
 
+ALTER TABLE users
+ADD COLUMN office_address TEXT DEFAULT NULL;
+
 -- ===========================================================
 -- END OF FILE
 -- ===========================================================

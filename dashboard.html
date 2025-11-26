@@ -202,6 +202,7 @@
                             <th class="px-4 py-3">Email</th>
                             <th class="px-4 py-3">No. Telepon</th>
                             <th class="px-4 py-3 max-lg:hidden">Organisasi</th>
+                            <th class="px-4 py-3 max-lg:hidden">Alamat</th>
                             <th class="px-4 py-3">Skor</th>
                             <th class="px-4 py-3 max-md:hidden">Integritas</th>
                             <th class="px-4 py-3 max-lg:hidden">Ranking</th>
@@ -540,12 +541,13 @@
                         <td class="px-4 py-3">${escapeHtml(item.email)}</td>
                         <td class="px-4 py-3">${escapeHtml(safePhone)}</td>
                         <td class="px-4 py-3 max-lg:hidden">${escapeHtml(safeOrg)}</td>
+                        <td class="px-4 py-3 max-lg:hidden">${escapeHtml(item.office_address ?? '-')}</td>
                         <td class="px-4 py-3">${item.core_score ?? '-'}</td>
                         <td class="px-4 py-3 max-md:hidden ${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status ?? '-'}</td>
                         <td class="px-4 py-3 max-lg:hidden">${ranking}</td>
                         <td class="px-4 py-3">${escapeHtml(safeStatus)}</td>
                         <td class="flex flex-wrap items-center justify-center gap-3 px-4 py-3">
-                            <button class="text-emerald-500 hover:text-emerald-600 active:text-emerald-700 view-answer-btn" data-id="${item.user_id}">Lihat</button>
+                            <button class="text-emerald-500 hover:text-emerald-600 active:text-emerald-700 view-answer-btn" data-id="${item.user_id}">Lihat Jawaban</button>
                             <!-- -->
                             <button class="text-amber-500 hover:text-amber-600 active:text-amber-700 edit-status-btn" data-id="${item.id}" data-manual-override="${item.manual_override}" data-status="${escapeHtml(safeStatus)}">Edit Status</button> 
                             <button class="text-blue-500 hover:text-blue-600 active:text-blue-700 send-email-btn" data-id="${item.user_id}">
@@ -574,6 +576,7 @@
                         <div class="mt-3 space-y-1 text-sm text-slate-600">
                             <div><strong>Telepon:</strong> ${escapeHtml(safePhone)}</div>
                             <div><strong>Organisasi:</strong> ${escapeHtml(safeOrg)}</div>
+                            <div><strong>Alamat:</strong> ${escapeHtml(item.office_address ?? '-')}</div>
                             <div><strong>Skor:</strong> ${item.core_score ?? '-'}</div>
                             <div><strong>Integritas:</strong> <span class="${item.integrity_status === 'LULUS' ? 'text-emerald-600' : 'text-rose-600'}">${item.integrity_status ?? '-'}</span></div>
                             <div><strong>Status:</strong> ${escapeHtml(safeStatus)}</div>
