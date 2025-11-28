@@ -18,15 +18,25 @@ if ($id <= 0) {
 }
 
 try {
+
+    $userId = $pdo->prepare("SELECT user_id FROM scores WHERE id = ?");
+    $userId->execute([$id]);
+    $userId = $userId->fetchColumn();
+
+    if (!$userId) {
+        echo json_encode(["success" => false, "message" => "Data tidak ditemukan"]);
+        exit;
+    }
+
     // Hapus data di tabel users
     $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt->execute([$userId]);
 
     // Hapus data skor di tabel scores (kalau ada)
-    $pdo->prepare("DELETE FROM scores WHERE user_id = ?")->execute([$id]);
+    $pdo->prepare("DELETE FROM scores WHERE user_id = ?")->execute([$userId]);
 
     // Hapus data responses kalau ada
-    $pdo->prepare("DELETE FROM responses WHERE user_id = ?")->execute([$id]);
+    $pdo->prepare("DELETE FROM responses WHERE user_id = ?")->execute([$userId]);
 
     echo json_encode(["success" => true]);
 
