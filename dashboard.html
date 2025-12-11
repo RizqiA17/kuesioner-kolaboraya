@@ -122,7 +122,10 @@
                             </button>
                         </div>
                     </div>
-
+                    <button
+                        class="flex items-center gap-2 border-none min-w-12 min-h-12 justify-center shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-gray-200 action-btn settingModalBtn">
+                        <span class="material-symbols-outlined">settings</span>Pengaturan
+                    </button>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -149,13 +152,13 @@
 
                         <button onclick="openBatchModal()"
                             class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700 ">
-                            <span class="material-symbols-outlined">download</span> Batch
+                            <span class="material-symbols-outlined">download</span> Kelas
                         </button>
 
-                        <a href="/pdf.html"
+                        <!-- <a href="/pdf.html"
                             class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700 ">
                             <span class="material-symbols-outlined">link</span> Print/PDF
-                        </a>
+                        </a> -->
                     </div>
 
                     <div class="max-sm:flex-grow">
@@ -259,15 +262,76 @@
 
     <!-- ========== MODALS ========== -->
 
+    <!-- Setting Modal -->
+    <div id="settingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="w-full max-w-sm p-6 text-center relative bg-white shadow-lg rounded-xl">
+            <button id="closeSettingModal"
+                class="absolute right-6 top-6 rounded-md border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700">
+                <span class="pointer-events-none material-symbols-outlined">
+                    close
+                </span>
+            </button>
+            <h3 class="mb-3 text-lg font-semibold">Pengaturan</h3>
+            <div class="flex flex-col gap-3">
+                <!-- <div class="flex flex-col gap-3 items-start">
+                    <label class="text-sm font-medium text-slate-700">Kuota Kursi</label>
+                    <div class="relative h-fit w-full">
+                        <input id="quotaInput" type="number" min="1" value="150"
+                            class="w-full px-4 py-2 border border-blue-300 rounded-md shadow-md focus:shadow-xl focus:outline-blue-500" />
+                        <button id="saveQuota"
+                            class="absolute top-0 right-0 flex items-center justify-center h-full px-3 bg-blue-500 text-slate-50 rounded-r-md hover:bg-blue-600 active:bg-blue-700 active:text-slate-200">
+                            <span class="material-symbols-outlined">save</span>
+                        </button>
+                    </div>
+                </div> -->
+                <div class="flex flex-col gap-3 items-start">
+                    <label class="text-sm font-medium text-slate-700">Anggota Kelas</label>
+                    <div class="relative h-fit w-full">
+                        <input id="classSize" type="number" min="1" value="150"
+                            class="w-full px-4 py-2 border border-blue-300 rounded-md shadow-md focus:shadow-xl focus:outline-blue-500" />
+                        <button id="saveClassSize"
+                            class="absolute top-0 right-0 flex items-center justify-center h-full px-3 bg-blue-500 text-slate-50 rounded-r-md hover:bg-blue-600 active:bg-blue-700 active:text-slate-200">
+                            <span class="material-symbols-outlined">save</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3 items-start">
+                    <label class="text-sm font-medium text-slate-700">Skor Minimal</label>
+                    <div class="relative h-fit w-full">
+                        <input id="minimumScore" type="number" min="1" value="150"
+                            class="w-full px-4 py-2 border border-blue-300 rounded-md shadow-md focus:shadow-xl focus:outline-blue-500" />
+                        <button id="saveMinimumScore"
+                            class="absolute top-0 right-0 flex items-center justify-center h-full px-3 bg-blue-500 text-slate-50 rounded-r-md hover:bg-blue-600 active:bg-blue-700 active:text-slate-200">
+                            <span class="material-symbols-outlined">save</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Download Batch Modal -->
     <div id="batchModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
         <div class="w-full max-w-sm p-6 text-center bg-white shadow-lg rounded-xl">
-            <h3 class="mb-3 text-lg font-semibold">Download Data per Batch</h3>
-            <p class="mb-4 text-sm text-slate-500">Pilih batch yang ingin diunduh.</p>
+            <h3 class="mb-3 text-lg font-semibold">Download Data per Kelas</h3>
+            <p class="mb-4 text-sm text-slate-500">Pilih Kelas yang ingin diunduh.</p>
 
-            <div id="batchList" class="flex flex-col gap-3">
+            <p class="text-sm text-slate-500">Kelas Utama.</p>
+            <div id="batchList" class="flex flex-col gap-3 overflow-auto max-h-48">
                 <!-- tombol batch akan dimasukkan lewat JS -->
             </div>
+
+            <button class="w-full border-t flex justify-center" id="expandBatchList">
+                <span class="material-symbols-outlined">expand_more</span>
+            </button>
+
+            <p class="text-sm text-slate-500">Kelas Sisa.</p>
+            <div id="moreBatchList" class="flex flex-col gap-3 max-h-0 overflow-auto">
+                <!-- tombol batch akan dimasukkan lewat JS -->
+            </div>
+            <button class="w-full border-t flex justify-center" id="expandMoreBatchList">
+                <span class="material-symbols-outlined">expand_more</span>
+            </button>
 
             <button id="closeBatchModal"
                 class="mt-4 px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 transition-all">
@@ -403,6 +467,10 @@
         const answerContent = document.getElementById('answerContent');
         const closeAnswerModal = document.getElementById('closeAnswerModal');
 
+        const settingModalBtn = document.querySelectorAll('.settingModalBtn');
+        const closeSettingModal = document.getElementById('closeSettingModal');
+        const settingModal = document.getElementById('settingModal');
+
         const statusModal = document.getElementById('statusModal');
         const statusModalName = document.getElementById('statusModalName');
         const newStatus = document.getElementById('newStatus');
@@ -428,22 +496,88 @@
         // Elemen modal
         const batchModal = document.getElementById("batchModal");
         const batchList = document.getElementById("batchList");
+        const expandBatchList = document.getElementById("expandBatchList");
+        const expandMoreBatchList = document.getElementById("expandMoreBatchList");
+        const moreBatchList = document.getElementById("moreBatchList");
         const closeBatchModalBtn = document.getElementById("closeBatchModal");
 
-        // Render tombol batch
-        function renderBatchButtons() {
-            batchList.innerHTML = "";
+        expandBatchList.addEventListener('click', () => {
+            if (batchList.classList.contains('max-h-0')) {
+                batchList.classList.remove('max-h-0');
+                batchList.classList.add('max-h-48');
 
-            availableBatches.forEach(b => {
-                const btn = document.createElement("button");
-                btn.className =
-                    "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
-                btn.textContent = b.label;
-                btn.onclick = () => {
-                    window.location.href = `/api/export_batch.php?batch=${b.id}`;
-                };
-                batchList.appendChild(btn);
-            });
+                moreBatchList.classList.remove('max-h-48');
+                moreBatchList.classList.add('max-h-0');
+            }
+            else {
+                batchList.classList.add('max-h-0');
+                batchList.classList.remove('max-h-48');
+            }
+        });
+
+        expandMoreBatchList.addEventListener('click', () => {
+            if (moreBatchList.classList.contains('max-h-0')) {
+                moreBatchList.classList.remove('max-h-0');
+                moreBatchList.classList.add('max-h-48');
+
+                batchList.classList.remove('max-h-48');
+                batchList.classList.add('max-h-0');
+            }
+            else {
+                moreBatchList.classList.add('max-h-0');
+                moreBatchList.classList.remove('max-h-48');
+            }
+        });
+
+        // Render tombol batch
+        async function renderBatchButtons() {
+            batchList.innerHTML = "";
+            moreBatchList.innerHTML = "";
+
+            try {
+                const response = await fetch("/api/get_batches.php");
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch batches");
+                }
+
+                const data = await response.json();
+
+                for (let i = 0; i < data[0].batch; i++) {
+                    const btn = document.createElement("button");
+                    btn.className =
+                        "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
+                    btn.textContent = `Kelas ${i + 1}`;
+                    btn.onclick = () => {
+                        window.location.href = `/api/export_batch.php?batch=${i + 1}`;
+                    };
+                    batchList.appendChild(btn);
+                }
+
+                for (let i = 0; i <= data[0].moreBatch; i++) {
+                    const btn = document.createElement("button");
+                    btn.className =
+                        "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
+                    btn.textContent = `Kelas ${i + data[0].batch + 1}`;
+                    btn.onclick = () => {
+                        window.location.href = `/api/export_batch.php?batch=${i + data[0].batch + 1}`;
+                    };
+                    moreBatchList.appendChild(btn);
+                }
+
+                // availableBatches.forEach(b => {
+                //     const btn = document.createElement("button");
+                //     btn.className =
+                //         "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
+                //     btn.textContent = b.label;
+                //     btn.onclick = () => {
+                //         window.location.href = `/api/export_batch.php?batch=${b.id}`;
+                //     };
+                //     batchList.appendChild(btn);
+                // });
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         // Buka modal
@@ -455,6 +589,35 @@
         // Tutup modal
         closeBatchModalBtn.addEventListener("click", () => {
             batchModal.classList.add("hidden");
+        });
+
+        settingModalBtn.forEach(element => {
+            element.addEventListener('click', () => {
+                settingModal.classList.remove('hidden');
+
+            });
+        });
+
+        async function settingData() {
+            try {
+                const res = await fetch('api/get_setting.php');
+                const json = await res.json();
+
+                const settings = {};
+                json.data.forEach(item => {
+                    settings[item.name] = item.value;
+                });
+
+                // document.getElementById('quotaInput').value = settings['quota'];
+                document.getElementById('classSize').value = settings['class_size'];
+                document.getElementById('minimumScore').value = settings['minimum_score'];
+            } catch (e) {
+                console.error('setting', e);
+            }
+        }
+
+        closeSettingModal.addEventListener('click', () => {
+            settingModal.classList.add('hidden')
         });
 
         /* ========= small helper: show confirm (promise) ========= */
@@ -489,6 +652,7 @@
 
             await loadQuota();
             await loadData();
+            await settingData();
             await loadOpenStatus();
         })();
 
@@ -571,6 +735,17 @@
                 alert(`Kuota diperbarui menjadi ${data.quota ?? newQuota}`);
                 await fetch('api/update_ranking.php'); await loadData();
             } catch (e) { console.error(e); alert('Gagal memperbarui kuota.'); }
+        });
+
+        document.getElementById('saveClassSize').addEventListener('click', async () => {
+            const nevClassSize = parseInt(document.getElementById('classSize').value);
+            const ok = await showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${nevClassSize}?`);
+            if (!ok) return;
+            try {
+                const res = await fetch('api/set_setting.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'class_size', value: nevClassSize }) });
+                const data = await res.json();
+                alert(`Ukuran Kelas diperbarui menjadi ${data.value ?? nevClassSize}`);
+            } catch (e) { console.error(e); alert("Gagal memperbarui ukuran kelas"); }
         });
 
         document.getElementById('updateRanking').addEventListener('click', async () => {

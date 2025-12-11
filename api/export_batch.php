@@ -13,17 +13,13 @@ if (!isset($_SESSION['facilitator_id'])) {
 $batchNumber = isset($_GET['batch']) ? intval($_GET['batch']) : 1;
 if ($batchNumber < 1) $batchNumber = 1;
 
-// Set ukuran batch
-$batchSize = 40;
+// Ambil limit dari settings
+$settingStmt = $pdo->prepare("SELECT value FROM settings WHERE name = 'class_size' LIMIT 1");
+$settingStmt->execute();
+$classSize = (int) $settingStmt->fetchColumn();
 
 // Hitung offset
-$offset = ($batchNumber - 1) * $batchSize;
-
-// Ambil minimum_score
-$settingStmt = $pdo->prepare("SELECT value FROM settings WHERE name = 'minimum_score' LIMIT 1");
-$settingStmt->execute();
-$minimumScore = (int)$settingStmt->fetchColumn();
-
+$offset = ($batchNumber - 1) * $classSize;
 
 // Ambil data (lulus atau gagal tapi nilai di atas minimum)
 $stmt = $pdo->prepare("
@@ -45,7 +41,7 @@ $stmt = $pdo->prepare("
     LIMIT :limit OFFSET :offset
 ");
 
-$stmt->bindValue(':limit', $batchSize, PDO::PARAM_INT);
+$stmt->bindValue(':limit', $classSize, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
 $stmt->execute();
@@ -55,7 +51,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Set headers CSV
 header('Content-Type: text/csv');
-header('Content-Disposition: attachment; filename="batch_' . $batchNumber . '.csv"');
+header('Content-Disposition: attachment; filename="kelas_' . $batchNumber . '.csv"');
 
 $output = fopen('php://output', 'w');
 
