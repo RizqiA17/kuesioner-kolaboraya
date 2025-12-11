@@ -264,10 +264,22 @@ ADD COLUMN office_address TEXT DEFAULT NULL;
 CREATE TABLE IF NOT EXISTS settings(
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
-    value VARCHAR(255) NOT NULL,
+    value VARCHAR(255) NOT NULL
 )
 
 INSERT INTO settings (name, value) VALUES ('minimum_score', '60');
+
+CREATE TABLE IF NOT EXISTS address(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    normalize_address TEXT NOT NULL,
+    token TEXT NOT NULL,
+    province VARCHAR(255) NOT NULL,
+    regency VARCHAR(255) NOT NULL,
+    district VARCHAR(255) NOT NULL,
+    village VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)
 
 -- ===========================================================
 -- END OF FILE
