@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Client Table + Print + PDF</title>
+    <link rel="stylesheet" href="./assets/style.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        @media print {
+
+            body {
+                background: white;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 11px;
+            }
+
+            th,
+            td {
+                border: 1px solid #000;
+                padding: 4px;
+                /* supaya teks membungkus dan tidak melebar */
+                white-space: normal !important;
+                word-break: break-word;
+            }
+
+            /* jika tabel masih terlalu lebar */
+            .print-container {
+                width: 100%;
+                overflow: visible !important;
+            }
+        }
+    </style>
+
+</head>
+
+<body class="bg-gray-100 p-6">
+
+    <div class="max-w-6xl mx-auto bg-white shadow rounded p-6">
+
+        <div class="flex items-center justify-between mb-4 no-print">
+            <h1 class="text-xl font-semibold">Data Results</h1>
+            <div class="flex flex-wrap gap-3">
+                <button id="printBtn"
+                    class="px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700 ">Print</button>
+                <button id="pdfBtn"
+                    class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700 ">Download
+                    PDF</button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto print-container">
+            <table id="resultsTable" class="min-w-full border border-gray-200 text-sm max-w-full">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="p-2 border">No</th>
+                        <th class="p-2 border">Name</th>
+                        <th class="p-2 border">Email</th>
+                        <th class="p-2 border">Phone</th>
+                        <th class="p-2 border">Organization</th>
+                        <th class="p-2 border">Score</th>
+                        <!-- <th class="p-2 border">Integrity</th>
+                        <th class="p-2 border">Ranking</th>
+                        <th class="p-2 border">Status</th> -->
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadData(limit = 100) {
+            let page = 1;
+            let totalPages = 1;
+            let allData = [];
+
+            while (page <= totalPages) {
+                const res = await fetch(`api/get_passed_results.php?page=${page}&limit=${limit}`);
+                const json = await res.json();
+
+                totalPages = json.totalPages;
+                allData = allData.concat(json.data);
+                page++;
+            }
+
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            allData.forEach(r => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td class="p-2 border">${r.ranking}</td>
+                <td class="p-2 border">${r.name}</td>
+                <td class="p-2 border">${r.email}</td>
+                    <td class="p-2 border">${r.phone}</td>
+                    <td class="p-2 border">${r.organization}</td>
+                    <td class="p-2 border">${r.core_score}</td>
+                `;
+
+                // <td class="p-2 border">${r.integrity_status}</td>
+                // <td class="p-2 border">${r.id}</td>
+                // <td class="p-2 border">${r.status}</td>
+                tbody.appendChild(tr);
+            });
+
+            window._latestData = allData;
+        }
+
+        document.getElementById("printBtn").addEventListener("click", () => {
+            window.print();
+        });
+
+        document.getElementById("pdfBtn").addEventListener("click", () => {
+            const { jsPDF } = window.jspdf;
+
+            const doc = new jsPDF({
+                orientation: "landscape",  // supaya melebar seperti print
+                unit: "pt",
+                format: "A4"
+            });
+
+            doc.setFontSize(14);
+            doc.text("Data Results", 40, 30);
+
+            const rows = window._latestData.map(r => [
+                r.ranking,
+                r.name,
+                r.email,
+                r.phone,
+                r.organization,
+                r.core_score,
+                r.integrity_status,
+                r.status
+            ]);
+
+            doc.autoTable({
+                head: [[
+                    "No", "Name", "Email", "Phone",
+                    "Organization", "Core Score",
+                    "Integrity", "Status"
+                ]],
+                body: rows,
+                startY: 50,
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 4,
+                    overflow: "linebreak"
+                },
+                columnStyles: {
+                    2: { cellWidth: 150 }, // Email
+                    4: { cellWidth: 150 }  // Organization
+                }
+            });
+
+            doc.save("results.pdf");
+        });
+
+
+        loadData();
+    </script>
+
+</body>
+
+</html>

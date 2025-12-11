@@ -6,3 +6,8 @@ email_log.txt
 /api/email_config.php
 /assets/output.css
 /assets/styles.css
+/node_modules/**/*
+/src/**/*
+/package.json
+/package-lock.json
+/tailwind.config.js

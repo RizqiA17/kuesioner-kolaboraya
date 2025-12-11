@@ -19,7 +19,7 @@ $stmt = $pdo->query("SELECT u.name, u.email, s.core_score, s.integrity_status, s
                         ORDER BY s.ranking ASC");
 
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    fputcsv($output, $row);
+    fputcsv($output, $row, "|");
 }
 fclose($output);
 ?>

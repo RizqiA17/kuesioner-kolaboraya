@@ -38,7 +38,7 @@ $stmt = $pdo->query("
 
 // Output baris CSV
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    fputcsv($output, $row);
+    fputcsv($output, $row, "|");
 }
 
 fclose($output);

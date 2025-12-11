@@ -261,6 +261,14 @@ ADD COLUMN manual_status ENUM('LULUS','TIDAK LOLOS') DEFAULT NULL;
 ALTER TABLE users
 ADD COLUMN office_address TEXT DEFAULT NULL;
 
+CREATE TABLE IF NOT EXISTS settings(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    value VARCHAR(255) NOT NULL,
+)
+
+INSERT INTO settings (name, value) VALUES ('minimum_score', '60');
+
 -- ===========================================================
 -- END OF FILE
 -- ===========================================================
