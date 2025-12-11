@@ -10,7 +10,7 @@ header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="peserta_lulus.csv"');
 
 $output = fopen('php://output', 'w');
-fputcsv($output, ['Nama', 'Email', 'Skor', 'Integritas', 'Ranking', 'Status']);
+fputcsv($output, ['Nama', 'Email', 'Skor', 'Integritas', 'Ranking', 'Status'], '|');
 
 $stmt = $pdo->query("SELECT u.name, u.email, s.core_score, s.integrity_status, s.ranking, s.status
                         FROM users u

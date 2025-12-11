@@ -24,7 +24,7 @@ fputcsv($output, [
     "Integritas",
     "Ranking",
     "Status"
-]);
+], "|");
 
 // Query dengan PDO
 $stmt = $pdo->query("
