@@ -57,14 +57,12 @@ $stmt = $pdo->prepare("
         FROM scores
         WHERE manual_override = 'NO'
             AND integrity_status = 'LULUS'
-            AND core_score >= :min_score
         ORDER BY core_score DESC, created_at ASC
         LIMIT :q
     ) sel ON s.id = sel.id
     SET s.status = 'LULUS'
 ");
 
-$stmt->bindValue(':min_score', $minScore);
 $stmt->bindValue(':q', (int) $effective_quota, PDO::PARAM_INT);
 $stmt->execute();
 

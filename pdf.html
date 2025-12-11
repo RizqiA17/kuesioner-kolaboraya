@@ -75,9 +75,9 @@
                         <th class="p-2 border">Phone</th>
                         <th class="p-2 border">Organization</th>
                         <th class="p-2 border">Score</th>
+                        <th class="p-2 border">Status</th>
                         <!-- <th class="p-2 border">Integrity</th>
-                        <th class="p-2 border">Ranking</th>
-                        <th class="p-2 border">Status</th> -->
+                        <th class="p-2 border">Ranking</th> -->
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -112,11 +112,11 @@
                     <td class="p-2 border">${r.phone}</td>
                     <td class="p-2 border">${r.organization}</td>
                     <td class="p-2 border">${r.core_score}</td>
+                    <td class="p-2 border">${r.status}</td>
                 `;
 
                 // <td class="p-2 border">${r.integrity_status}</td>
                 // <td class="p-2 border">${r.id}</td>
-                // <td class="p-2 border">${r.status}</td>
                 tbody.appendChild(tr);
             });
 

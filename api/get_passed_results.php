@@ -9,7 +9,7 @@ if (!isset($_SESSION['facilitator_id'])) {
     exit;
 }
 
-// Pagination (opsional)
+// Pagination
 $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $limit = isset($_GET['limit']) ? max(1, intval($_GET['limit'])) : 20;
 $offset = ($page - 1) * $limit;
@@ -17,17 +17,26 @@ $offset = ($page - 1) * $limit;
 // Ambil kuota
 $quota = $pdo->query("SELECT quota FROM quota_settings WHERE id = 1")->fetchColumn();
 
-// Hitung total peserta LOLOS
-$total = $pdo->query("
-    SELECT COUNT(*) 
-    FROM scores 
+// Ambil minimum_score dari settings
+$minStmt = $pdo->prepare("SELECT value FROM settings WHERE name = 'minimum_score' LIMIT 1");
+$minStmt->execute();
+$minimumScore = (int)$minStmt->fetchColumn();
+
+
+// Hitung total peserta yang diambil
+$totalStmt = $pdo->prepare("
+    SELECT COUNT(*)
+    FROM scores
     WHERE 
         (manual_override = 'YES' AND manual_status = 'LULUS')
-        OR
-        (manual_override = 'NO' AND status = 'LULUS')
-")->fetchColumn();
+        OR (manual_override = 'NO' AND status = 'LULUS')
+        OR (status = 'GAGAL' AND core_score >= :minScore)
+");
+$totalStmt->execute([':minScore' => $minimumScore]);
+$total = $totalStmt->fetchColumn();
 
-// Ambil hanya peserta LOLOS
+
+// Ambil data peserta
 $stmt = $pdo->prepare("
     SELECT 
         s.id,
@@ -47,17 +56,18 @@ $stmt = $pdo->prepare("
     JOIN users u ON u.id = s.user_id
     WHERE 
         (s.manual_override = 'YES' AND s.manual_status = 'LULUS')
-        OR
-        (s.manual_override = 'NO' AND s.status = 'LULUS')
+        OR (s.manual_override = 'NO' AND s.status = 'LULUS')
+        OR (s.status = 'TIDAK LOLOS' AND s.core_score >= :minScore)
     ORDER BY s.ranking ASC
     LIMIT :limit OFFSET :offset
 ");
-
+$stmt->bindValue(':minScore', $minimumScore, PDO::PARAM_INT);
 $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Buat format final
 $data = [];
@@ -66,6 +76,11 @@ foreach ($rows as $r) {
     $finalStatus = $r['manual_override'] === "YES"
         ? $r['manual_status']
         : $r['status'];
+
+    // Jika status GAGAL tapi core_score >= minimumScore → status dianggap LULUS
+    if ($finalStatus === 'GAGAL' && (int)$r['core_score'] >= $minimumScore) {
+        $finalStatus = 'LULUS';
+    }
 
     $data[] = [
         'id' => (int)$r['id'],
