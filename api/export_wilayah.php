@@ -1,9 +1,15 @@
 <?php
+
+ob_start();
+
 require_once 'db.php';
 session_start();
 
 if (!isset($_SESSION['facilitator_id'])) {
     http_response_code(401);
+
+    ob_end_flush();
+
     exit;
 }
 
@@ -40,6 +46,9 @@ $wilayahLabel = 'Semua_Wilayah';
 */
 if (!isset($_GET['provinsi'])) {
     echo json_encode(['status' => false, 'message' => 'Tidak ada wilayah yang dipilih']);
+
+    ob_end_flush();
+
     exit;
 }
 
@@ -130,6 +139,9 @@ if ($limitPerCsv === null) {
     }
 
     fclose($out);
+
+    ob_end_flush();
+
     exit;
 }
 
@@ -143,9 +155,11 @@ $countStmt->execute($params);
 $totalRows = (int) $countStmt->fetchColumn();
 
 $tmpZipPath = tempnam(sys_get_temp_dir(), 'zip_');
+unlink($tmpZipPath);
 
 $zip = new ZipArchive();
-$zip->open($tmpZipPath, ZipArchive::CREATE);
+$zip->open($tmpZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
 
 for ($offset = 0, $batch = 1; $offset < $totalRows; $offset += $limitPerCsv, $batch++) {
 
@@ -215,4 +229,7 @@ header('Content-Length: ' . filesize($tmpZipPath));
 
 readfile($tmpZipPath);
 unlink($tmpZipPath);
+
+ob_end_flush();
+
 exit;
