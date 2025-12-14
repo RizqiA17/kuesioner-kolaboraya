@@ -226,6 +226,11 @@ $zip->close();
 header('Content-Type: application/zip');
 header('Content-Disposition: attachment; filename="peserta_' . $wilayahLabel . '.zip"');
 header('Content-Length: ' . filesize($tmpZipPath));
+header('Content-Transfer-Encoding: binary');
+header('X-Content-Type-Options: nosniff');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
+
 
 readfile($tmpZipPath);
 unlink($tmpZipPath);
