@@ -8196,5 +8196,27 @@ ALTER TABLE address
 ADD UNIQUE KEY uniq_user (user_id);
 
 -- ===========================================================
+-- 9. TABLE ADDRESS
+-- ===========================================================
+
+CREATE TABLE tokens (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    token CHAR(64) NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+
+    params_hash CHAR(64) NULL,
+    expires_at DATETIME NOT NULL,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE KEY uq_token (token),
+    KEY idx_facilitator (facilitator_id),
+    KEY idx_expires (expires_at)
+) ENGINE=InnoDB;
+
+
+-- ===========================================================
 -- END OF FILE
 -- ===========================================================

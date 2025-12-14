@@ -3,15 +3,33 @@
 ob_start();
 
 require_once 'db.php';
-session_start();
 
-// if (!isset($_SESSION['facilitator_id'])) {
-//     http_response_code(401);
+if (empty($_GET['token'])) {
+    http_response_code(401);
+    exit;
+}
 
-//     ob_end_flush();
+$stmt = $pdo->prepare("
+    SELECT id
+    FROM tokens
+    WHERE token = :token
+        AND expires_at > NOW()
+    LIMIT 1
+");
 
-//     exit;
-// }
+$stmt->execute([
+    ':token' => $_GET['token']
+]);
+
+$tokenRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$tokenRow) {
+    http_response_code(401);
+    exit;
+}
+
+$pdo->prepare("DELETE FROM tokens WHERE id = :id")
+    ->execute([':id' => $tokenRow['id']]);
 
 /*
 |--------------------------------------------------

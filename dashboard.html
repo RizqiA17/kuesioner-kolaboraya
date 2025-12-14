@@ -645,22 +645,37 @@
                 const kabupatenKota = document.getElementById('kabupaten_kota');
                 const limitPerCsv = document.getElementById('limit_per_csv');
 
-                url = "/api/export_wilayah.php";
+                fetch('/api/generate_token.php', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.success || !res.token) {
+                            alert('Gagal membuat token download');
+                            return;
+                        }
 
-                if (prov.value != "") {
-                    url += `?provinsi=${prov.value}`;
-                } 
+                        let url = '/api/export_wilayah.php?token=' + encodeURIComponent(res.token);
 
-                if (kabupatenKota.value != "") {
-                    url += `&kabupaten=${kabupatenKota.value}`;
-                }
+                        if (prov.value !== '') {
+                            url += '&provinsi=' + encodeURIComponent(prov.value);
+                        }
 
-                if (limitPerCsv.value != "") {
-                    url += `&limit_per_csv=${limitPerCsv.value}`;
-                }
+                        if (kabupatenKota.value !== '') {
+                            url += '&kabupaten=' + encodeURIComponent(kabupatenKota.value);
+                        }
 
-                window.location.href = url;
-            })
+                        if (limitPerCsv.value !== '') {
+                            url += '&limit_per_csv=' + encodeURIComponent(limitPerCsv.value);
+                        }
+
+                        window.location.href = url;
+                    })
+                    .catch(() => {
+                        alert('Terjadi kesalahan saat meminta token');
+                    });
+            });
 
             // Tutup modal
             closeWilayahModalBtn.addEventListener("click", () => {
