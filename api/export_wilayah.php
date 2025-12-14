@@ -5,13 +5,13 @@ ob_start();
 require_once 'db.php';
 session_start();
 
-if (!isset($_SESSION['facilitator_id'])) {
-    http_response_code(401);
+// if (!isset($_SESSION['facilitator_id'])) {
+//     http_response_code(401);
 
-    ob_end_flush();
+//     ob_end_flush();
 
-    exit;
-}
+//     exit;
+// }
 
 /*
 |--------------------------------------------------
