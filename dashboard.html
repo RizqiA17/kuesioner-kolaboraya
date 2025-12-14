@@ -155,6 +155,11 @@
                             <span class="material-symbols-outlined">download</span> Kelas
                         </button>
 
+                        <button onclick="openWilayahModal()"
+                            class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700 ">
+                            <span class="material-symbols-outlined">download</span> Wilayah
+                        </button>
+
                         <!-- <a href="/pdf.html"
                             class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700 ">
                             <span class="material-symbols-outlined">link</span> Print/PDF
@@ -262,18 +267,51 @@
 
     <!-- ========== MODALS ========== -->
 
-    <!-- Setting Modal -->
-    <div id="settingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+    <!-- Download Per Wilayah Modal -->
+    <div id="wilayahModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
         <div class="w-full max-w-sm p-6 text-center relative bg-white shadow-lg rounded-xl">
-            <button id="closeSettingModal"
+            <button id="closeWilayahModal"
                 class="absolute right-6 top-6 rounded-md border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700">
                 <span class="pointer-events-none material-symbols-outlined">
                     close
                 </span>
             </button>
-            <h3 class="mb-3 text-lg font-semibold">Pengaturan</h3>
+            <h3 class="mb-3 text-lg font-semibold">Wilayah</h3>
             <div class="flex flex-col gap-3">
-                <!-- <div class="flex flex-col gap-3 items-start">
+                <label class="text-sm font-medium text-slate-700">Provinsi</label>
+                <select name="provinsi"
+                    class=" mb-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    id="provinsi">
+                    <option value="" selected>- Pilih Provinsi -</option>
+                </select>
+                <label class="text-sm font-medium text-slate-700">Kabupaten/Kota</label>
+                <select name="kabupaten_kota"
+                    class=" mb-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    id="kabupaten_kota" disabled>
+                    <option value="" selected>- Pilih Kabupaten/Kota -</option>
+                </select>
+                <label class="text-sm font-medium text-slate-700">Kabupaten/Kota</label>
+                <input name="limit_per_csv"
+                    class=" mb-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    id="limit_per_csv" type="number" placeholder="Masukan jumlah data per CSV (OPTIONAL)" />
+            </div>
+            <button id="downloadWilayahBtn"
+                class="px-3 py-2 rounded-md border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700">Download
+                Data</button>
+        </div>
+
+        <!-- Setting Modal -->
+        <div id="settingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+            <div class="w-full max-w-sm p-6 text-center relative bg-white shadow-lg rounded-xl">
+                <button id="closeSettingModal"
+                    class="absolute right-6 top-6 rounded-md border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700">
+                    <span class="pointer-events-none material-symbols-outlined">
+                        close
+                    </span>
+                </button>
+                <h3 class="mb-3 text-lg font-semibold">Pengaturan</h3>
+                <div class="flex flex-col gap-3">
+                    <!-- <div class="flex flex-col gap-3 items-start">
                     <label class="text-sm font-medium text-slate-700">Kuota Kursi</label>
                     <div class="relative h-fit w-full">
                         <input id="quotaInput" type="number" min="1" value="150"
@@ -284,517 +322,598 @@
                         </button>
                     </div>
                 </div> -->
-                <div class="flex flex-col gap-3 items-start">
-                    <label class="text-sm font-medium text-slate-700">Anggota Kelas</label>
-                    <div class="relative h-fit w-full">
-                        <input id="classSize" type="number" min="1" value="150"
-                            class="w-full px-4 py-2 border border-blue-300 rounded-md shadow-md focus:shadow-xl focus:outline-blue-500" />
-                        <button id="saveClassSize"
-                            class="absolute top-0 right-0 flex items-center justify-center h-full px-3 bg-blue-500 text-slate-50 rounded-r-md hover:bg-blue-600 active:bg-blue-700 active:text-slate-200">
-                            <span class="material-symbols-outlined">save</span>
-                        </button>
+                    <div class="flex flex-col gap-3 items-start">
+                        <label class="text-sm font-medium text-slate-700">Anggota Kelas</label>
+                        <div class="relative h-fit w-full">
+                            <input id="classSize" type="number" min="1" value="150"
+                                class="w-full px-4 py-2 border border-blue-300 rounded-md shadow-md focus:shadow-xl focus:outline-blue-500" />
+                            <button id="saveClassSize"
+                                class="absolute top-0 right-0 flex items-center justify-center h-full px-3 bg-blue-500 text-slate-50 rounded-r-md hover:bg-blue-600 active:bg-blue-700 active:text-slate-200">
+                                <span class="material-symbols-outlined">save</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3 items-start">
+                        <label class="text-sm font-medium text-slate-700">Skor Minimal</label>
+                        <div class="relative h-fit w-full">
+                            <input id="minimumScore" type="number" min="1" value="150"
+                                class="w-full px-4 py-2 border border-blue-300 rounded-md shadow-md focus:shadow-xl focus:outline-blue-500" />
+                            <button id="saveMinimumScore"
+                                class="absolute top-0 right-0 flex items-center justify-center h-full px-3 bg-blue-500 text-slate-50 rounded-r-md hover:bg-blue-600 active:bg-blue-700 active:text-slate-200">
+                                <span class="material-symbols-outlined">save</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="flex flex-col gap-3 items-start">
-                    <label class="text-sm font-medium text-slate-700">Skor Minimal</label>
-                    <div class="relative h-fit w-full">
-                        <input id="minimumScore" type="number" min="1" value="150"
-                            class="w-full px-4 py-2 border border-blue-300 rounded-md shadow-md focus:shadow-xl focus:outline-blue-500" />
-                        <button id="saveMinimumScore"
-                            class="absolute top-0 right-0 flex items-center justify-center h-full px-3 bg-blue-500 text-slate-50 rounded-r-md hover:bg-blue-600 active:bg-blue-700 active:text-slate-200">
-                            <span class="material-symbols-outlined">save</span>
-                        </button>
-                    </div>
+            </div>
+        </div>
+
+        <!-- Download Batch Modal -->
+        <div id="batchModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
+            <div class="w-full max-w-sm p-6 text-center bg-white shadow-lg rounded-xl">
+                <h3 class="mb-3 text-lg font-semibold">Download Data per Kelas</h3>
+                <p class="mb-4 text-sm text-slate-500">Pilih Kelas yang ingin diunduh.</p>
+
+                <p class="text-sm text-slate-500">Kelas Utama.</p>
+                <div id="batchList" class="flex flex-col gap-3 overflow-auto max-h-48">
+                    <!-- tombol batch akan dimasukkan lewat JS -->
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Download Batch Modal -->
-    <div id="batchModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
-        <div class="w-full max-w-sm p-6 text-center bg-white shadow-lg rounded-xl">
-            <h3 class="mb-3 text-lg font-semibold">Download Data per Kelas</h3>
-            <p class="mb-4 text-sm text-slate-500">Pilih Kelas yang ingin diunduh.</p>
+                <button class="w-full border-t flex justify-center" id="expandBatchList">
+                    <span class="material-symbols-outlined">expand_more</span>
+                </button>
 
-            <p class="text-sm text-slate-500">Kelas Utama.</p>
-            <div id="batchList" class="flex flex-col gap-3 overflow-auto max-h-48">
-                <!-- tombol batch akan dimasukkan lewat JS -->
-            </div>
+                <p class="text-sm text-slate-500">Kelas Sisa.</p>
+                <div id="moreBatchList" class="flex flex-col gap-3 max-h-0 overflow-auto">
+                    <!-- tombol batch akan dimasukkan lewat JS -->
+                </div>
+                <button class="w-full border-t flex justify-center" id="expandMoreBatchList">
+                    <span class="material-symbols-outlined">expand_more</span>
+                </button>
 
-            <button class="w-full border-t flex justify-center" id="expandBatchList">
-                <span class="material-symbols-outlined">expand_more</span>
-            </button>
-
-            <p class="text-sm text-slate-500">Kelas Sisa.</p>
-            <div id="moreBatchList" class="flex flex-col gap-3 max-h-0 overflow-auto">
-                <!-- tombol batch akan dimasukkan lewat JS -->
-            </div>
-            <button class="w-full border-t flex justify-center" id="expandMoreBatchList">
-                <span class="material-symbols-outlined">expand_more</span>
-            </button>
-
-            <button id="closeBatchModal"
-                class="mt-4 px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 transition-all">
-                Tutup
-            </button>
-        </div>
-    </div>
-
-
-    <!-- QR Modal -->
-    <div id="qrModal" class="fixed inset-0 z-40 flex items-center justify-center hidden p-4 modal-backdrop">
-        <div class="w-full max-w-sm p-5 bg-white shadow-lg rounded-xl">
-            <h3 class="pb-2 mb-3 text-lg font-semibold border-b">Scan QR untuk membuka kuesioner</h3>
-            <div class="flex justify-center mb-4"><canvas id="qrCanvas" class="rounded-md bg-slate-50"></canvas></div>
-            <div class="flex gap-2 pt-4 border-t">
-                <button id="downloadQrBtn"
-                    class="flex-1 px-3 py-2 rounded-md max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700">Download
-                    QR</button>
-                <button id="closeQr"
-                    class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirm Modal (Promise-based) -->
-    <div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
-        <div class="w-full max-w-md p-6 text-center bg-white shadow-lg rounded-xl">
-            <div class="flex justify-center w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
-                    fill="#F19E39">
-                    <path
-                        d="m40-120 440-760 440 760H40Zm104-60h672L480-760 144-180Zm340.18-57q12.82 0 21.32-8.68 8.5-8.67 8.5-21.5 0-12.82-8.68-21.32-8.67-8.5-21.5-8.5-12.82 0-21.32 8.68-8.5 8.67-8.5 21.5 0 12.82 8.68 21.32 8.67 8.5 21.5 8.5ZM454-348h60v-224h-60v224Zm26-122Z" />
-                </svg>
-            </div>
-            <p id="confirmText" class="mb-4 text-base font-medium text-slate-700"></p>
-            <div class="flex justify-center gap-3">
-                <button id="confirmYes"
-                    class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Ya</button>
-                <button id="confirmNo"
-                    class="flex items-center gap-2 py-2 px-4 rounded-md border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700">Batal</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Download choice modal (step 2) -->
-    <div id="downloadChoiceModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
-        <div class="w-full max-w-sm p-6 text-center bg-white shadow-lg rounded-xl">
-            <h3 class="mb-2 text-lg font-semibold">Hapus Semua Data</h3>
-            <p class="mb-4 text-sm text-slate-500">Pilih salah satu tindakan sebelum menghapus seluruh data.</p>
-
-            <div class="flex flex-col gap-3">
-                <button id="dlPassedBtn"
-                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Download
-                    Data
-                    Lulus</button>
-                <button id="dlAllBtn"
-                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Download
-                    Semua Data</button>
-                <button id="deleteDirectBtn"
-                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-red-700">Hapus
-                    Tanpa
-                    Download</button>
-                <button id="cancelDlChoice"
-                    class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-gray-200">Batal</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Answers Modal -->
-    <div id="answerModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
-        <div class="w-full max-w-2xl p-6 bg-white shadow-lg rounded-xl">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold">Jawaban Peserta</h3>
-                <button id="closeAnswerModal" class="text-slate-500 hover:text-slate-600 active:text-slate-700">
-                    <span class="material-symbols-outlined">
-                        close
-                    </span>
+                <button id="closeBatchModal"
+                    class="mt-4 px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 transition-all">
+                    Tutup
                 </button>
             </div>
-            <div id="answerContent" class="p-3 overflow-y-auto text-sm text-gray-800 border rounded max-h-72"></div>
         </div>
-    </div>
 
-    <!-- Status edit modal -->
-    <div id="statusModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
-        <div class="w-full max-w-sm p-6 bg-white shadow-lg rounded-xl">
-            <h3 class="mb-3 text-lg font-semibold text-center">Ubah Status Peserta</h3>
-            <p id="statusModalName" class="mb-4 text-sm text-center text-slate-500"></p>
 
-            <div class="relative w-full mb-4">
-                <select id="newStatus" class="w-full px-3 py-2 border rounded-md appearance-none border-slate-300">
-                    <option value="LULUS">LULUS</option>
-                    <option value="TIDAK LOLOS">TIDAK LOLOS</option>
-                </select>
-                <span
-                    class="absolute top-0 flex items-center h-full pointer-events-none material-symbols-outlined right-2">
-                    expand_more
-                </span>
-            </div>
-
-            <button id="autoStatus"
-                class="w-full mb-4 px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700">Otomatis</button>
-            <div class="flex gap-3">
-                <button id="confirmStatusBtn"
-                    class="flex-1 px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Simpan</button>
-                <button id="cancelStatusBtn"
-                    class="flex-1 px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-gray-200">Batal</button>
+        <!-- QR Modal -->
+        <div id="qrModal" class="fixed inset-0 z-40 flex items-center justify-center hidden p-4 modal-backdrop">
+            <div class="w-full max-w-sm p-5 bg-white shadow-lg rounded-xl">
+                <h3 class="pb-2 mb-3 text-lg font-semibold border-b">Scan QR untuk membuka kuesioner</h3>
+                <div class="flex justify-center mb-4"><canvas id="qrCanvas" class="rounded-md bg-slate-50"></canvas>
+                </div>
+                <div class="flex gap-2 pt-4 border-t">
+                    <button id="downloadQrBtn"
+                        class="flex-1 px-3 py-2 rounded-md max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700">Download
+                        QR</button>
+                    <button id="closeQr"
+                        class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Tutup</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- ================= SCRIPT ================= -->
-    <script>
-        /* ========= state ========= */
-        let currentPage = 1, limit = 20, currentFilter = "ALL";
-        const questionnaireUrl = window.location.origin;
-        const batchData = [
-            { id: 1, name: "Batch 1" },
-            { id: 2, name: "Batch 2" },
-            { id: 3, name: "Batch 3" }
-        ];
+        <!-- Confirm Modal (Promise-based) -->
+        <div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
+            <div class="w-full max-w-md p-6 text-center bg-white shadow-lg rounded-xl">
+                <div class="flex justify-center w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
+                        fill="#F19E39">
+                        <path
+                            d="m40-120 440-760 440 760H40Zm104-60h672L480-760 144-180Zm340.18-57q12.82 0 21.32-8.68 8.5-8.67 8.5-21.5 0-12.82-8.68-21.32-8.67-8.5-21.5-8.5-12.82 0-21.32 8.68-8.5 8.67-8.5 21.5 0 12.82 8.68 21.32 8.67 8.5 21.5 8.5ZM454-348h60v-224h-60v224Zm26-122Z" />
+                    </svg>
+                </div>
+                <p id="confirmText" class="mb-4 text-base font-medium text-slate-700"></p>
+                <div class="flex justify-center gap-3">
+                    <button id="confirmYes"
+                        class="px-4 py-2 rounded-md flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Ya</button>
+                    <button id="confirmNo"
+                        class="flex items-center gap-2 py-2 px-4 rounded-md border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700">Batal</button>
+                </div>
+            </div>
+        </div>
 
-        /* ========= elements ========= */
-        const qrModal = document.getElementById('qrModal');
-        const qrCanvas = document.getElementById('qrCanvas');
-        const toggleOpenBtn = document.querySelectorAll('.toggleOpenBtn');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const confirmModal = document.getElementById('confirmModal');
-        const confirmText = document.getElementById('confirmText');
-        const downloadChoiceModal = document.getElementById('downloadChoiceModal');
+        <!-- Download choice modal (step 2) -->
+        <div id="downloadChoiceModal"
+            class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
+            <div class="w-full max-w-sm p-6 text-center bg-white shadow-lg rounded-xl">
+                <h3 class="mb-2 text-lg font-semibold">Hapus Semua Data</h3>
+                <p class="mb-4 text-sm text-slate-500">Pilih salah satu tindakan sebelum menghapus seluruh data.</p>
 
-        const answerModal = document.getElementById('answerModal');
-        const answerContent = document.getElementById('answerContent');
-        const closeAnswerModal = document.getElementById('closeAnswerModal');
+                <div class="flex flex-col gap-3">
+                    <button id="dlPassedBtn"
+                        class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Download
+                        Data
+                        Lulus</button>
+                    <button id="dlAllBtn"
+                        class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Download
+                        Semua Data</button>
+                    <button id="deleteDirectBtn"
+                        class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-red-700">Hapus
+                        Tanpa
+                        Download</button>
+                    <button id="cancelDlChoice"
+                        class="px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-gray-200">Batal</button>
+                </div>
+            </div>
+        </div>
 
-        const settingModalBtn = document.querySelectorAll('.settingModalBtn');
-        const closeSettingModal = document.getElementById('closeSettingModal');
-        const settingModal = document.getElementById('settingModal');
+        <!-- View Answers Modal -->
+        <div id="answerModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
+            <div class="w-full max-w-2xl p-6 bg-white shadow-lg rounded-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold">Jawaban Peserta</h3>
+                    <button id="closeAnswerModal" class="text-slate-500 hover:text-slate-600 active:text-slate-700">
+                        <span class="material-symbols-outlined">
+                            close
+                        </span>
+                    </button>
+                </div>
+                <div id="answerContent" class="p-3 overflow-y-auto text-sm text-gray-800 border rounded max-h-72"></div>
+            </div>
+        </div>
 
-        const statusModal = document.getElementById('statusModal');
-        const statusModalName = document.getElementById('statusModalName');
-        const newStatus = document.getElementById('newStatus');
-        const confirmStatusBtn = document.getElementById('confirmStatusBtn');
-        const autoStatus = document.getElementById('autoStatus');
-        const cancelStatusBtn = document.getElementById('cancelStatusBtn');
+        <!-- Status edit modal -->
+        <div id="statusModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-4 modal-backdrop">
+            <div class="w-full max-w-sm p-6 bg-white shadow-lg rounded-xl">
+                <h3 class="mb-3 text-lg font-semibold text-center">Ubah Status Peserta</h3>
+                <p id="statusModalName" class="mb-4 text-sm text-center text-slate-500"></p>
 
-        let editingUserId = null;
+                <div class="relative w-full mb-4">
+                    <select id="newStatus" class="w-full px-3 py-2 border rounded-md appearance-none border-slate-300">
+                        <option value="LULUS">LULUS</option>
+                        <option value="TIDAK LOLOS">TIDAK LOLOS</option>
+                    </select>
+                    <span
+                        class="absolute top-0 flex items-center h-full pointer-events-none material-symbols-outlined right-2">
+                        expand_more
+                    </span>
+                </div>
 
-        // ===============================
-        // Batch Download Modal Logic
-        // ===============================
+                <button id="autoStatus"
+                    class="w-full mb-4 px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 max-sm:flex-grow border-none justify-center shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-blue-700">Otomatis</button>
+                <div class="flex gap-3">
+                    <button id="confirmStatusBtn"
+                        class="flex-1 px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-50 bg-emerald-500 hover:bg-emerald-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-emerald-700">Simpan</button>
+                    <button id="cancelStatusBtn"
+                        class="flex-1 px-4 py-2 rounded-md text-center gap-2 border-none shadow-md text-slate-900 bg-slate-100 hover:bg-gray-100 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]  active:translate-y-0.5 active:scale-1 active:bg-gray-200">Batal</button>
+                </div>
+            </div>
+        </div>
 
-        // Elemen modal
-        // Konfigurasi batch yang tersedia (ubah sesuai kebutuhan)
-        const availableBatches = [
-            { id: 1, label: "Batch 1 (40 peserta)" },
-            { id: 2, label: "Batch 2 (40 peserta)" },
-            { id: 3, label: "Batch 3 (40 peserta)" },
-            { id: 4, label: "Batch 4 (40 peserta)" }
-        ];
+        <!-- ================= SCRIPT ================= -->
+        <script>
+            /* ========= state ========= */
+            let currentPage = 1, limit = 20, currentFilter = "ALL";
+            const questionnaireUrl = window.location.origin;
+            const batchData = [
+                { id: 1, name: "Batch 1" },
+                { id: 2, name: "Batch 2" },
+                { id: 3, name: "Batch 3" }
+            ];
 
-        // Elemen modal
-        const batchModal = document.getElementById("batchModal");
-        const batchList = document.getElementById("batchList");
-        const expandBatchList = document.getElementById("expandBatchList");
-        const expandMoreBatchList = document.getElementById("expandMoreBatchList");
-        const moreBatchList = document.getElementById("moreBatchList");
-        const closeBatchModalBtn = document.getElementById("closeBatchModal");
+            /* ========= elements ========= */
+            const qrModal = document.getElementById('qrModal');
+            const qrCanvas = document.getElementById('qrCanvas');
+            const toggleOpenBtn = document.querySelectorAll('.toggleOpenBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const confirmModal = document.getElementById('confirmModal');
+            const confirmText = document.getElementById('confirmText');
+            const downloadChoiceModal = document.getElementById('downloadChoiceModal');
 
-        expandBatchList.addEventListener('click', () => {
-            if (batchList.classList.contains('max-h-0')) {
-                batchList.classList.remove('max-h-0');
-                batchList.classList.add('max-h-48');
+            const answerModal = document.getElementById('answerModal');
+            const answerContent = document.getElementById('answerContent');
+            const closeAnswerModal = document.getElementById('closeAnswerModal');
 
-                moreBatchList.classList.remove('max-h-48');
-                moreBatchList.classList.add('max-h-0');
-            }
-            else {
-                batchList.classList.add('max-h-0');
-                batchList.classList.remove('max-h-48');
-            }
-        });
+            const settingModalBtn = document.querySelectorAll('.settingModalBtn');
+            const closeSettingModal = document.getElementById('closeSettingModal');
+            const settingModal = document.getElementById('settingModal');
 
-        expandMoreBatchList.addEventListener('click', () => {
-            if (moreBatchList.classList.contains('max-h-0')) {
-                moreBatchList.classList.remove('max-h-0');
-                moreBatchList.classList.add('max-h-48');
+            const statusModal = document.getElementById('statusModal');
+            const statusModalName = document.getElementById('statusModalName');
+            const newStatus = document.getElementById('newStatus');
+            const confirmStatusBtn = document.getElementById('confirmStatusBtn');
+            const autoStatus = document.getElementById('autoStatus');
+            const cancelStatusBtn = document.getElementById('cancelStatusBtn');
 
-                batchList.classList.remove('max-h-48');
-                batchList.classList.add('max-h-0');
-            }
-            else {
-                moreBatchList.classList.add('max-h-0');
-                moreBatchList.classList.remove('max-h-48');
-            }
-        });
+            let editingUserId = null;
 
-        // Render tombol batch
-        async function renderBatchButtons() {
-            batchList.innerHTML = "";
-            moreBatchList.innerHTML = "";
+            // ===============================
+            // Batch Download Modal Logic
+            // ===============================
 
-            try {
-                const response = await fetch("/api/get_batches.php");
+            // Elemen modal
+            // Konfigurasi batch yang tersedia (ubah sesuai kebutuhan)
+            const availableBatches = [
+                { id: 1, label: "Batch 1 (40 peserta)" },
+                { id: 2, label: "Batch 2 (40 peserta)" },
+                { id: 3, label: "Batch 3 (40 peserta)" },
+                { id: 4, label: "Batch 4 (40 peserta)" }
+            ];
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch batches");
+            // Elemen modal
+            const wilayahModal = document.getElementById("wilayahModal");
+            const closeWilayahModalBtn = document.getElementById("closeWilayahModal");
+            const downloadWilayahBtn = document.getElementById('downloadWilayahBtn');
+            const batchModal = document.getElementById("batchModal");
+            const batchList = document.getElementById("batchList");
+            const expandBatchList = document.getElementById("expandBatchList");
+            const expandMoreBatchList = document.getElementById("expandMoreBatchList");
+            const moreBatchList = document.getElementById("moreBatchList");
+            const closeBatchModalBtn = document.getElementById("closeBatchModal");
+
+            expandBatchList.addEventListener('click', () => {
+                if (batchList.classList.contains('max-h-0')) {
+                    batchList.classList.remove('max-h-0');
+                    batchList.classList.add('max-h-48');
+
+                    moreBatchList.classList.remove('max-h-48');
+                    moreBatchList.classList.add('max-h-0');
                 }
-
-                const data = await response.json();
-
-                for (let i = 0; i < data[0].batch; i++) {
-                    const btn = document.createElement("button");
-                    btn.className =
-                        "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
-                    btn.textContent = `Kelas ${i + 1}`;
-                    btn.onclick = () => {
-                        window.location.href = `/api/export_batch.php?batch=${i + 1}`;
-                    };
-                    batchList.appendChild(btn);
+                else {
+                    batchList.classList.add('max-h-0');
+                    batchList.classList.remove('max-h-48');
                 }
+            });
 
-                for (let i = 0; i <= data[0].moreBatch; i++) {
-                    const btn = document.createElement("button");
-                    btn.className =
-                        "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
-                    btn.textContent = `Kelas ${i + data[0].batch + 1}`;
-                    btn.onclick = () => {
-                        window.location.href = `/api/export_batch.php?batch=${i + data[0].batch + 1}`;
-                    };
-                    moreBatchList.appendChild(btn);
+            expandMoreBatchList.addEventListener('click', () => {
+                if (moreBatchList.classList.contains('max-h-0')) {
+                    moreBatchList.classList.remove('max-h-0');
+                    moreBatchList.classList.add('max-h-48');
+
+                    batchList.classList.remove('max-h-48');
+                    batchList.classList.add('max-h-0');
                 }
-
-                // availableBatches.forEach(b => {
-                //     const btn = document.createElement("button");
-                //     btn.className =
-                //         "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
-                //     btn.textContent = b.label;
-                //     btn.onclick = () => {
-                //         window.location.href = `/api/export_batch.php?batch=${b.id}`;
-                //     };
-                //     batchList.appendChild(btn);
-                // });
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        // Buka modal
-        function openBatchModal() {
-            renderBatchButtons();
-            batchModal.classList.remove("hidden");
-        }
-
-        // Tutup modal
-        closeBatchModalBtn.addEventListener("click", () => {
-            batchModal.classList.add("hidden");
-        });
-
-        settingModalBtn.forEach(element => {
-            element.addEventListener('click', () => {
-                settingModal.classList.remove('hidden');
-
+                else {
+                    moreBatchList.classList.add('max-h-0');
+                    moreBatchList.classList.remove('max-h-48');
+                }
             });
-        });
 
-        async function settingData() {
-            try {
-                const res = await fetch('api/get_setting.php');
-                const json = await res.json();
+            // Render tombol batch
+            async function renderBatchButtons() {
+                batchList.innerHTML = "";
+                moreBatchList.innerHTML = "";
 
-                const settings = {};
-                json.data.forEach(item => {
-                    settings[item.name] = item.value;
-                });
-
-                // document.getElementById('quotaInput').value = settings['quota'];
-                document.getElementById('classSize').value = settings['class_size'];
-                document.getElementById('minimumScore').value = settings['minimum_score'];
-            } catch (e) {
-                console.error('setting', e);
-            }
-        }
-
-        closeSettingModal.addEventListener('click', () => {
-            settingModal.classList.add('hidden')
-        });
-
-        /* ========= small helper: show confirm (promise) ========= */
-        function showConfirm(message) {
-            return new Promise(resolve => {
-                confirmText.textContent = message;
-                confirmModal.classList.remove('hidden');
-
-                const yes = document.getElementById('confirmYes');
-                const no = document.getElementById('confirmNo');
-
-                // remove old listeners by cloning nodes
-                const yesClone = yes.cloneNode(true);
-                const noClone = no.cloneNode(true);
-                yes.replaceWith(yesClone);
-                no.replaceWith(noClone);
-
-                const cleanup = () => confirmModal.classList.add('hidden');
-
-                yesClone.addEventListener('click', () => { cleanup(); resolve(true); });
-                noClone.addEventListener('click', () => { cleanup(); resolve(false); });
-            });
-        }
-
-        /* ========= init: auth + loads ========= */
-        (async () => {
-            try {
-                const res = await fetch('api/check_auth.php');
-                const data = await res.json();
-                if (!data.authenticated) { location.href = 'login.html'; return; }
-            } catch (e) { console.error('auth error', e); location.href = 'login.html'; return; }
-
-            await loadQuota();
-            await loadData();
-            await settingData();
-            await loadOpenStatus();
-        })();
-
-        /* ========= bindings ========= */
-        document.querySelectorAll('.logoutBtn').forEach(element => {
-            element.addEventListener('click', () => location.href = 'api/logout.php')
-        });
-
-        document.querySelectorAll(".shareLinkBtn").forEach(element => {
-            element.addEventListener('click', () => {
-                if (navigator.clipboard?.writeText) {
-                    navigator.clipboard.writeText(questionnaireUrl).then(() => alert('Link kuesioner disalin ke clipboard!'))
-                        .catch(err => alert('Gagal menyalin link: ' + err));
-                } else prompt('Salin link kuesioner berikut:', questionnaireUrl);
-            });
-        });
-
-        // QR
-        document.querySelectorAll('.qrBtn').forEach(element => {
-            element.addEventListener('click', () => {
                 try {
-                    QRCode.toCanvas(qrCanvas, questionnaireUrl, { width: 200 }, e => {
-                        if (e) console.error(e);
-                        qrModal.classList.remove('hidden');
-                    });
-                } catch (e) { console.error(e); }
-            })
-        });
-        document.getElementById('closeQr').addEventListener('click', () => qrModal.classList.add('hidden'));
-        document.getElementById('downloadQrBtn').addEventListener('click', () => {
-            const link = document.createElement('a'); link.href = qrCanvas.toDataURL('image/png'); link.download = 'kuesioner_qr.png'; link.click();
-        });
+                    const response = await fetch("/api/get_batches.php");
 
-        // open/close kuesioner
-        async function loadOpenStatus() {
-            try {
-                const res = await fetch('api/open_question.php'); const data = await res.json();
-                updateOpenButton(data.is_open ?? 0);
-            } catch (e) { toggleOpenBtn.textContent = 'Error'; }
-        }
-        function updateOpenButton(status) {
-            toggleOpenBtn.forEach(element => {
-                isMobile = element.getAttribute('data-mobile') == 'true';
-                // console.log(isMobile);
-                element.dataset.status = status;
-                element.innerHTML = '<span class="material-symbols-outlined">' + (status == 1 ? 'lock' : 'lock_open_right') + '</span> ' + (isMobile ? '' : (status == 1 ? 'Tutup' : 'Buka') + ' Kuesioner');
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch batches");
+                    }
+
+                    const data = await response.json();
+
+                    for (let i = 0; i < data[0].batch; i++) {
+                        const btn = document.createElement("button");
+                        btn.className =
+                            "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
+                        btn.textContent = `Kelas ${i + 1}`;
+                        btn.onclick = () => {
+                            window.location.href = `/api/export_batch.php?batch=${i + 1}`;
+                        };
+                        batchList.appendChild(btn);
+                    }
+
+                    for (let i = 0; i <= data[0].moreBatch; i++) {
+                        const btn = document.createElement("button");
+                        btn.className =
+                            "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
+                        btn.textContent = `Kelas ${i + data[0].batch + 1}`;
+                        btn.onclick = () => {
+                            window.location.href = `/api/export_batch.php?batch=${i + data[0].batch + 1}`;
+                        };
+                        moreBatchList.appendChild(btn);
+                    }
+
+                    // availableBatches.forEach(b => {
+                    //     const btn = document.createElement("button");
+                    //     btn.className =
+                    //         "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
+                    //     btn.textContent = b.label;
+                    //     btn.onclick = () => {
+                    //         window.location.href = `/api/export_batch.php?batch=${b.id}`;
+                    //     };
+                    //     batchList.appendChild(btn);
+                    // });
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            // Buka modal
+            function openBatchModal() {
+                renderBatchButtons();
+                batchModal.classList.remove("hidden");
+            }
+
+            // Tutup modal
+            closeBatchModalBtn.addEventListener("click", () => {
+                batchModal.classList.add("hidden");
             });
-        }
 
-        toggleOpenBtn.forEach(element => {
-            element.addEventListener('click', async () => {
-                const newStatus = element.dataset.status == 1 ? 0 : 1;
-                const ok = await showConfirm(`Apakah Anda yakin ingin ${newStatus ? 'membuka' : 'menutup'} kuesioner?`);
+            // Buka modal
+            function openWilayahModal() {
+                renderProvinsiOption();
+                wilayahModal.classList.remove("hidden");
+            }
+
+            downloadWilayahBtn.addEventListener('click', () => {
+                const prov = document.getElementById('provinsi');
+                const kabupatenKota = document.getElementById('kabupaten_kota');
+                const limitPerCsv = document.getElementById('limit_per_csv');
+
+                url = "/api/export_wilayah.php";
+
+                if (prov.value != "") {
+                    url += `?provinsi=${prov.value}`;
+                } 
+
+                if (kabupatenKota.value != "") {
+                    url += `&kabupaten=${kabupatenKota.value}`;
+                }
+
+                if (limitPerCsv.value != "") {
+                    url += `&limit_per_csv=${limitPerCsv.value}`;
+                }
+
+                window.location.href = url;
+            })
+
+            // Tutup modal
+            closeWilayahModalBtn.addEventListener("click", () => {
+                wilayahModal.classList.add("hidden");
+            });
+
+            settingModalBtn.forEach(element => {
+                element.addEventListener('click', () => {
+                    settingModal.classList.remove('hidden');
+
+                });
+            });
+
+            async function renderProvinsiOption() {
+                try {
+                    const res = await fetch('api/get_provincies.php');
+                    const json = await res.json();
+                    const prov = document.getElementById('provinsi');
+                    prov.innerHTML = ""
+
+                    prov.innerHTML += '<option value="" disabled selected>- Pilih Provinsi -</option>';
+
+                    json.data.forEach(item => {
+                        prov.innerHTML += `<option value="${item.code}">${item.name}</option>`
+                    });
+                    prov.innerHTML += '<option value="none">TIDAK TERDETEKSI</option>';
+                } catch (e) {
+                    console.error('error:', e);
+                }
+            }
+
+            document.getElementById('provinsi').addEventListener('change', async (e) => {
+                const prov = e.target.value;
+                const kabSelect = document.getElementById('kabupaten_kota');
+
+                console.log(prov);
+                console.log(prov === "none");
+
+                kabSelect.innerHTML = "";
+
+                try {
+                    const res = await fetch(`/api/get_regencies.php?prov=${prov}`);
+                    const result = await res.json();
+
+                    kabSelect.innerHTML = '<option value="" disabled selected>- Pilih Kabupaten / Kota (OPTIONAL) -</option>';
+                    result.data.forEach(regency => {
+                        kabSelect.innerHTML += `<option value="${regency.code}">${regency.name}</option>`;
+                    });
+
+                    kabSelect.disabled = prov === "none";
+
+                } catch (e) {
+                    console.error(e);
+                }
+            })
+
+            async function settingData() {
+                try {
+                    const res = await fetch('api/get_setting.php');
+                    const json = await res.json();
+
+                    const settings = {};
+                    json.data.forEach(item => {
+                        settings[item.name] = item.value;
+                    });
+
+                    // document.getElementById('quotaInput').value = settings['quota'];
+                    document.getElementById('classSize').value = settings['class_size'];
+                    document.getElementById('minimumScore').value = settings['minimum_score'];
+                } catch (e) {
+                    console.error('setting', e);
+                }
+            }
+
+            closeSettingModal.addEventListener('click', () => {
+                settingModal.classList.add('hidden')
+            });
+
+            /* ========= small helper: show confirm (promise) ========= */
+            function showConfirm(message) {
+                return new Promise(resolve => {
+                    confirmText.textContent = message;
+                    confirmModal.classList.remove('hidden');
+
+                    const yes = document.getElementById('confirmYes');
+                    const no = document.getElementById('confirmNo');
+
+                    // remove old listeners by cloning nodes
+                    const yesClone = yes.cloneNode(true);
+                    const noClone = no.cloneNode(true);
+                    yes.replaceWith(yesClone);
+                    no.replaceWith(noClone);
+
+                    const cleanup = () => confirmModal.classList.add('hidden');
+
+                    yesClone.addEventListener('click', () => { cleanup(); resolve(true); });
+                    noClone.addEventListener('click', () => { cleanup(); resolve(false); });
+                });
+            }
+
+            /* ========= init: auth + loads ========= */
+            (async () => {
+                try {
+                    const res = await fetch('api/check_auth.php');
+                    const data = await res.json();
+                    if (!data.authenticated) { location.href = 'login.html'; return; }
+                } catch (e) { console.error('auth error', e); location.href = 'login.html'; return; }
+
+                await loadQuota();
+                await loadData();
+                await settingData();
+                await loadOpenStatus();
+            })();
+
+            /* ========= bindings ========= */
+            document.querySelectorAll('.logoutBtn').forEach(element => {
+                element.addEventListener('click', () => location.href = 'api/logout.php')
+            });
+
+            document.querySelectorAll(".shareLinkBtn").forEach(element => {
+                element.addEventListener('click', () => {
+                    if (navigator.clipboard?.writeText) {
+                        navigator.clipboard.writeText(questionnaireUrl).then(() => alert('Link kuesioner disalin ke clipboard!'))
+                            .catch(err => alert('Gagal menyalin link: ' + err));
+                    } else prompt('Salin link kuesioner berikut:', questionnaireUrl);
+                });
+            });
+
+            // QR
+            document.querySelectorAll('.qrBtn').forEach(element => {
+                element.addEventListener('click', () => {
+                    try {
+                        QRCode.toCanvas(qrCanvas, questionnaireUrl, { width: 200 }, e => {
+                            if (e) console.error(e);
+                            qrModal.classList.remove('hidden');
+                        });
+                    } catch (e) { console.error(e); }
+                })
+            });
+            document.getElementById('closeQr').addEventListener('click', () => qrModal.classList.add('hidden'));
+            document.getElementById('downloadQrBtn').addEventListener('click', () => {
+                const link = document.createElement('a'); link.href = qrCanvas.toDataURL('image/png'); link.download = 'kuesioner_qr.png'; link.click();
+            });
+
+            // open/close kuesioner
+            async function loadOpenStatus() {
+                try {
+                    const res = await fetch('api/open_question.php'); const data = await res.json();
+                    updateOpenButton(data.is_open ?? 0);
+                } catch (e) { toggleOpenBtn.textContent = 'Error'; }
+            }
+            function updateOpenButton(status) {
+                toggleOpenBtn.forEach(element => {
+                    isMobile = element.getAttribute('data-mobile') == 'true';
+                    // console.log(isMobile);
+                    element.dataset.status = status;
+                    element.innerHTML = '<span class="material-symbols-outlined">' + (status == 1 ? 'lock' : 'lock_open_right') + '</span> ' + (isMobile ? '' : (status == 1 ? 'Tutup' : 'Buka') + ' Kuesioner');
+                });
+            }
+
+            toggleOpenBtn.forEach(element => {
+                element.addEventListener('click', async () => {
+                    const newStatus = element.dataset.status == 1 ? 0 : 1;
+                    const ok = await showConfirm(`Apakah Anda yakin ingin ${newStatus ? 'membuka' : 'menutup'} kuesioner?`);
+                    if (!ok) return;
+                    try {
+                        const res = await fetch('api/open_question.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ open: newStatus }) });
+                        const data = await res.json();
+                        if (data.success) { updateOpenButton(newStatus); alert(data.message || 'Status diperbarui.'); }
+                        else alert(data.message || 'Gagal memperbarui status.');
+                    } catch (e) { console.error(e); alert('Kesalahan saat memperbarui status.'); }
+                });
+            });
+
+            // quota
+            async function loadQuota() {
+                try {
+                    const res = await fetch('api/get_quota.php'); const data = await res.json();
+                    document.getElementById('quotaInput').value = data.quota ?? 150;
+                    document.getElementById('quotaInfo').textContent = `Kuota kursi saat ini: ${data.quota ?? 150}. Peserta dengan ranking ≤ ${data.quota ?? 150} dan integritas LULUS akan berstatus LULUS.`;
+                } catch (e) { console.error('loadQuota', e); }
+            }
+
+            document.getElementById('saveQuota').addEventListener('click', async () => {
+                const newQuota = parseInt(document.getElementById('quotaInput').value);
+                const ok = await showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${newQuota}?`);
                 if (!ok) return;
                 try {
-                    const res = await fetch('api/open_question.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ open: newStatus }) });
+                    const res = await fetch('api/update_quota.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quota: newQuota }) });
                     const data = await res.json();
-                    if (data.success) { updateOpenButton(newStatus); alert(data.message || 'Status diperbarui.'); }
-                    else alert(data.message || 'Gagal memperbarui status.');
-                } catch (e) { console.error(e); alert('Kesalahan saat memperbarui status.'); }
+                    alert(`Kuota diperbarui menjadi ${data.quota ?? newQuota}`);
+                    await fetch('api/update_ranking.php'); await loadData();
+                } catch (e) { console.error(e); alert('Gagal memperbarui kuota.'); }
             });
-        });
 
-        // quota
-        async function loadQuota() {
-            try {
-                const res = await fetch('api/get_quota.php'); const data = await res.json();
-                document.getElementById('quotaInput').value = data.quota ?? 150;
-                document.getElementById('quotaInfo').textContent = `Kuota kursi saat ini: ${data.quota ?? 150}. Peserta dengan ranking ≤ ${data.quota ?? 150} dan integritas LULUS akan berstatus LULUS.`;
-            } catch (e) { console.error('loadQuota', e); }
-        }
+            document.getElementById('saveClassSize').addEventListener('click', async () => {
+                const nevClassSize = parseInt(document.getElementById('classSize').value);
+                const ok = await showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${nevClassSize}?`);
+                if (!ok) return;
+                try {
+                    const res = await fetch('api/set_setting.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'class_size', value: nevClassSize }) });
+                    const data = await res.json();
+                    alert(`Ukuran Kelas diperbarui menjadi ${data.value ?? nevClassSize}`);
+                } catch (e) { console.error(e); alert("Gagal memperbarui ukuran kelas"); }
+            });
 
-        document.getElementById('saveQuota').addEventListener('click', async () => {
-            const newQuota = parseInt(document.getElementById('quotaInput').value);
-            const ok = await showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${newQuota}?`);
-            if (!ok) return;
-            try {
-                const res = await fetch('api/update_quota.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quota: newQuota }) });
-                const data = await res.json();
-                alert(`Kuota diperbarui menjadi ${data.quota ?? newQuota}`);
+            document.getElementById('updateRanking').addEventListener('click', async () => {
+                const ok = await showConfirm('Apakah yakin ingin memperbarui ranking peserta?');
+                if (!ok) return;
                 await fetch('api/update_ranking.php'); await loadData();
-            } catch (e) { console.error(e); alert('Gagal memperbarui kuota.'); }
-        });
+            });
 
-        document.getElementById('saveClassSize').addEventListener('click', async () => {
-            const nevClassSize = parseInt(document.getElementById('classSize').value);
-            const ok = await showConfirm(`Apakah yakin ingin memperbarui kuota menjadi ${nevClassSize}?`);
-            if (!ok) return;
-            try {
-                const res = await fetch('api/set_setting.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'class_size', value: nevClassSize }) });
-                const data = await res.json();
-                alert(`Ukuran Kelas diperbarui menjadi ${data.value ?? nevClassSize}`);
-            } catch (e) { console.error(e); alert("Gagal memperbarui ukuran kelas"); }
-        });
+            document.getElementById('filterStatus').addEventListener('change', e => { currentFilter = e.target.value; loadData(currentPage); });
+            document.getElementById('limitSelect').addEventListener('change', e => { limit = parseInt(e.target.value); currentPage = 1; loadData(currentPage); });
+            document.getElementById('downloadPassed').addEventListener('click', () => { window.location.href = 'api/export_selected.php'; });
+            document.getElementById('downloadAll').addEventListener('click', () => { window.location.href = 'api/export_all.php'; });
 
-        document.getElementById('updateRanking').addEventListener('click', async () => {
-            const ok = await showConfirm('Apakah yakin ingin memperbarui ranking peserta?');
-            if (!ok) return;
-            await fetch('api/update_ranking.php'); await loadData();
-        });
+            /* ========= loadData (responsive) ========= */
+            async function loadData(page = 1) {
+                const spinner = document.getElementById('loadingSpinner'); spinner && spinner.classList.remove('hidden');
 
-        document.getElementById('filterStatus').addEventListener('change', e => { currentFilter = e.target.value; loadData(currentPage); });
-        document.getElementById('limitSelect').addEventListener('change', e => { limit = parseInt(e.target.value); currentPage = 1; loadData(currentPage); });
-        document.getElementById('downloadPassed').addEventListener('click', () => { window.location.href = 'api/export_selected.php'; });
-        document.getElementById('downloadAll').addEventListener('click', () => { window.location.href = 'api/export_all.php'; });
+                try {
+                    const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
+                    const result = await res.json();
 
-        /* ========= loadData (responsive) ========= */
-        async function loadData(page = 1) {
-            const spinner = document.getElementById('loadingSpinner'); spinner && spinner.classList.remove('hidden');
-
-            try {
-                const res = await fetch(`api/get_results.php?page=${page}&limit=${limit}`);
-                const result = await res.json();
-
-                const filtered = (result.data || [])
-                    .filter(item => currentFilter === "ALL" ? true : (item.status ?? '').toUpperCase() === currentFilter)
-                    .sort((a, b) => {
-                        // kalau filter LULUS, urutkan manual LULUS setelah otomatis
-                        if (currentFilter === "LULUS") {
-                            // console.log(a);
-                            // manual override YES taruh di belakang otomatis
-                            if (a.manual_override === "YES" && b.manual_override === "NO") return 1;
-                            if (a.manual_override === "NO" && b.manual_override === "YES") return -1;
-                        }
-                        return (a.ranking ?? 9999) - (b.ranking ?? 9999);
-                    });
+                    const filtered = (result.data || [])
+                        .filter(item => currentFilter === "ALL" ? true : (item.status ?? '').toUpperCase() === currentFilter)
+                        .sort((a, b) => {
+                            // kalau filter LULUS, urutkan manual LULUS setelah otomatis
+                            if (currentFilter === "LULUS") {
+                                // console.log(a);
+                                // manual override YES taruh di belakang otomatis
+                                if (a.manual_override === "YES" && b.manual_override === "NO") return 1;
+                                if (a.manual_override === "NO" && b.manual_override === "YES") return -1;
+                            }
+                            return (a.ranking ?? 9999) - (b.ranking ?? 9999);
+                        });
 
 
-                const tbody = document.getElementById('dataTable');
-                const mobileList = document.getElementById('mobileList');
-                tbody.innerHTML = ''; mobileList.innerHTML = '';
+                    const tbody = document.getElementById('dataTable');
+                    const mobileList = document.getElementById('mobileList');
+                    tbody.innerHTML = ''; mobileList.innerHTML = '';
 
-                filtered.forEach(item => {
-                    const safeStatus = item.status ?? '-';
-                    const safePhone = item.phone ?? '-';
-                    const safeOrg = item.organization ?? '-';
-                    const ranking = item.ranking ?? '-';
+                    filtered.forEach(item => {
+                        const safeStatus = item.status ?? '-';
+                        const safePhone = item.phone ?? '-';
+                        const safeOrg = item.organization ?? '-';
+                        const ranking = item.ranking ?? '-';
 
-                    // desktop row
-                    const row = document.createElement('tr');
-                    row.className = 'text-slate-700';
-                    row.innerHTML = `
+                        // desktop row
+                        const row = document.createElement('tr');
+                        row.className = 'text-slate-700';
+                        row.innerHTML = `
                         <td class="px-4 py-3">${ranking}</td>
                         <td class="px-4 py-3">${escapeHtml(item.name)}</td>
                         <td class="px-4 py-3">${escapeHtml(item.email)}</td>
@@ -815,12 +934,12 @@
                             <button class="text-red-500 hover:text-red-600 active:text-red-700 delete-row-btn" data-id="${item.id}">Hapus</button>
                         </td>
                         `;
-                    tbody.appendChild(row);
+                        tbody.appendChild(row);
 
-                    // mobile card
-                    const card = document.createElement('div');
-                    card.className = 'bg-white rounded-xl p-4 shadow-sm sm:hidden shadow';
-                    card.innerHTML = `
+                        // mobile card
+                        const card = document.createElement('div');
+                        card.className = 'bg-white rounded-xl p-4 shadow-sm sm:hidden shadow';
+                        card.innerHTML = `
                         <div class="flex justify-between">
                             <div>
                                 <div class="font-semibold">${escapeHtml(item.name)}</div>
@@ -849,119 +968,119 @@
                             <button class="w-full px-4 py-2 border-none shadow-md text-slate-50 bg-red-500 hover:bg-red-600 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:translate-y-0.5 active:scale-1 active:bg-red-700 rounded-md delete-row-btn" data-id="${item.id}">Hapus</button>
                         </div>
                         `;
-                    mobileList.appendChild(card);
-                });
+                        mobileList.appendChild(card);
+                    });
 
-                renderPagination(result.page || 1, result.totalPages || 1);
-            } catch (e) {
-                console.error('loadData error', e);
-                alert('Gagal memuat data. Cek koneksi atau API.');
-            } finally {
-                spinner && spinner.classList.add('hidden');
+                    renderPagination(result.page || 1, result.totalPages || 1);
+                } catch (e) {
+                    console.error('loadData error', e);
+                    alert('Gagal memuat data. Cek koneksi atau API.');
+                } finally {
+                    spinner && spinner.classList.add('hidden');
+                }
             }
-        }
 
-        /* ========= delete one ========= */
-        document.addEventListener('click', async ev => {
-            const t = ev.target;
-            if (!t.classList.contains('delete-row-btn')) return;
-            const id = t.dataset.id;
-            const ok = await showConfirm('Hapus peserta ini?');
-            if (!ok) return;
-            try {
-                const res = await fetch('api/delete_one.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-                const data = await res.json();
-                if (data.success) await loadData(currentPage); else alert(data.message || 'Gagal menghapus.');
-            } catch (e) { console.error(e); alert('Gagal menghapus data.'); }
-        });
+            /* ========= delete one ========= */
+            document.addEventListener('click', async ev => {
+                const t = ev.target;
+                if (!t.classList.contains('delete-row-btn')) return;
+                const id = t.dataset.id;
+                const ok = await showConfirm('Hapus peserta ini?');
+                if (!ok) return;
+                try {
+                    const res = await fetch('api/delete_one.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+                    const data = await res.json();
+                    if (data.success) await loadData(currentPage); else alert(data.message || 'Gagal menghapus.');
+                } catch (e) { console.error(e); alert('Gagal menghapus data.'); }
+            });
 
-        /* ========= delete all ========= */
-        document.getElementById('deleteAllBtn').addEventListener('click', async () => {
-            const ok1 = await showConfirm('Yakin ingin menghapus SEMUA data peserta?');
-            if (!ok1) return;
+            /* ========= delete all ========= */
+            document.getElementById('deleteAllBtn').addEventListener('click', async () => {
+                const ok1 = await showConfirm('Yakin ingin menghapus SEMUA data peserta?');
+                if (!ok1) return;
 
-            downloadChoiceModal.classList.remove('hidden');
-            const closeModal = () => downloadChoiceModal.classList.add('hidden');
+                downloadChoiceModal.classList.remove('hidden');
+                const closeModal = () => downloadChoiceModal.classList.add('hidden');
 
-            document.getElementById('dlPassedBtn').onclick = async () => {
-                window.open('api/export_selected.php', '_blank');
-                await finalDeleteConfirm();
-            };
-            document.querySelectorAll('.dlAllBtn').onclick = async () => {
-                window.open('api/export_all.php', '_blank');
-                await finalDeleteConfirm();
-            };
-            document.getElementById('deleteDirectBtn').onclick = async () => {
-                closeModal();
+                document.getElementById('dlPassedBtn').onclick = async () => {
+                    window.open('api/export_selected.php', '_blank');
+                    await finalDeleteConfirm();
+                };
+                document.querySelectorAll('.dlAllBtn').onclick = async () => {
+                    window.open('api/export_all.php', '_blank');
+                    await finalDeleteConfirm();
+                };
+                document.getElementById('deleteDirectBtn').onclick = async () => {
+                    closeModal();
+                    await doFinalDelete();
+                };
+                document.getElementById('cancelDlChoice').onclick = () => { closeModal(); };
+            });
+
+            async function finalDeleteConfirm() {
+                downloadChoiceModal.classList.add('hidden');
+                const ok = await showConfirm('Data sudah diunduh. Hapus sekarang?');
+                if (!ok) return;
                 await doFinalDelete();
-            };
-            document.getElementById('cancelDlChoice').onclick = () => { closeModal(); };
-        });
+            }
 
-        async function finalDeleteConfirm() {
-            downloadChoiceModal.classList.add('hidden');
-            const ok = await showConfirm('Data sudah diunduh. Hapus sekarang?');
-            if (!ok) return;
-            await doFinalDelete();
-        }
+            async function doFinalDelete() {
+                try {
+                    const res = await fetch('api/delete_all.php', { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) { alert('Semua data telah dihapus.'); await loadData(1); }
+                    else alert(data.message || 'Gagal menghapus semua data.');
+                } catch (e) { console.error(e); alert('Gagal menghapus semua data.'); }
+            }
 
-        async function doFinalDelete() {
-            try {
-                const res = await fetch('api/delete_all.php', { method: 'POST' });
-                const data = await res.json();
-                if (data.success) { alert('Semua data telah dihapus.'); await loadData(1); }
-                else alert(data.message || 'Gagal menghapus semua data.');
-            } catch (e) { console.error(e); alert('Gagal menghapus semua data.'); }
-        }
+            /* ========= pagination ========= */
+            function renderPagination(page, totalPages) {
+                const container = document.getElementById('paginationControls'); container.innerHTML = '';
+                const makeBtn = (label, pg, disabled = false, active = false) => {
+                    const btn = document.createElement('button');
+                    btn.textContent = label;
+                    btn.className = 'px-3 py-1 rounded-full text-sm transition-colors duration-300 ' + (active ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-sky-200 active:bg-sky-700 active:text-white');
+                    if (!disabled && !active) btn.addEventListener('click', () => loadData(pg));
+                    if (disabled) btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    return btn;
+                };
+                container.appendChild(makeBtn('Prev', page - 1, page <= 1));
+                const range = 2;
+                const start = Math.max(1, page - range); const end = Math.min(totalPages, page + range);
+                for (let i = start; i <= end; i++) container.appendChild(makeBtn(i, i, false, i === page));
+                container.appendChild(makeBtn('Next', page + 1, page >= totalPages));
+                currentPage = page;
+            }
 
-        /* ========= pagination ========= */
-        function renderPagination(page, totalPages) {
-            const container = document.getElementById('paginationControls'); container.innerHTML = '';
-            const makeBtn = (label, pg, disabled = false, active = false) => {
-                const btn = document.createElement('button');
-                btn.textContent = label;
-                btn.className = 'px-3 py-1 rounded-full text-sm transition-colors duration-300 ' + (active ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-sky-200 active:bg-sky-700 active:text-white');
-                if (!disabled && !active) btn.addEventListener('click', () => loadData(pg));
-                if (disabled) btn.classList.add('opacity-50', 'cursor-not-allowed');
-                return btn;
-            };
-            container.appendChild(makeBtn('Prev', page - 1, page <= 1));
-            const range = 2;
-            const start = Math.max(1, page - range); const end = Math.min(totalPages, page + range);
-            for (let i = start; i <= end; i++) container.appendChild(makeBtn(i, i, false, i === page));
-            container.appendChild(makeBtn('Next', page + 1, page >= totalPages));
-            currentPage = page;
-        }
-
-        /* ========= view answers ========= */
-        document.addEventListener('click', async e => {
-            if (!e.target.classList.contains('view-answer-btn')) return;
-            const userId = e.target.dataset.id;
-            try {
-                const res = await fetch('api/get_user_answers.php?id=' + encodeURIComponent(userId));
-                const data = await res.json();
-                if (!data.success) { alert('Gagal memuat jawaban.'); return; }
-                let html = '';
-                (data.answers || []).forEach((a, i) => {
-                    answerColor = "text-gray-500";
-                    switch (a.answer_text) {
-                        case "Sangat Setuju":
-                            answerColor = a.reversed == '1' ? "text-red-600" : "text-green-600";
-                            break;
-                        case "Setuju":
-                            answerColor = a.reversed == '1' ? "text-orange-600" : "text-lime-600";
-                            break;
-                        case "Netral":
-                            answerColor = "text-yellow-600";
-                            break;
-                        case "Tidak Setuju":
-                            answerColor = a.reversed == '1' ? "text-lime-600" : "text-orange-600";
-                            break;
-                        case "Sangat Tidak Setuju":
-                            answerColor = a.reversed == '1' ? "text-green-600" : "text-red-600";
-                            break;
-                    }
-                    html += `<div class="mb-3">
+            /* ========= view answers ========= */
+            document.addEventListener('click', async e => {
+                if (!e.target.classList.contains('view-answer-btn')) return;
+                const userId = e.target.dataset.id;
+                try {
+                    const res = await fetch('api/get_user_answers.php?id=' + encodeURIComponent(userId));
+                    const data = await res.json();
+                    if (!data.success) { alert('Gagal memuat jawaban.'); return; }
+                    let html = '';
+                    (data.answers || []).forEach((a, i) => {
+                        answerColor = "text-gray-500";
+                        switch (a.answer_text) {
+                            case "Sangat Setuju":
+                                answerColor = a.reversed == '1' ? "text-red-600" : "text-green-600";
+                                break;
+                            case "Setuju":
+                                answerColor = a.reversed == '1' ? "text-orange-600" : "text-lime-600";
+                                break;
+                            case "Netral":
+                                answerColor = "text-yellow-600";
+                                break;
+                            case "Tidak Setuju":
+                                answerColor = a.reversed == '1' ? "text-lime-600" : "text-orange-600";
+                                break;
+                            case "Sangat Tidak Setuju":
+                                answerColor = a.reversed == '1' ? "text-green-600" : "text-red-600";
+                                break;
+                        }
+                        html += `<div class="mb-3">
                                 <div class="flex gap-2">${i + 1}.
                                     <div>
                                     <p class="font-medium">${escapeHtml(a.question)}</p>
@@ -969,96 +1088,96 @@
                                     </div>
                                 </div>
                             </div>`;
-                });
-                answerContent && (answerContent.innerHTML = html || '<div class="text-sm text-slate-500">Tidak ada jawaban.</div>');
-                answerModal.classList.remove('hidden');
-            } catch (e) { console.error(e); alert('Gagal memuat jawaban.'); }
-        });
-        closeAnswerModal && closeAnswerModal.addEventListener('click', () => answerModal.classList.add('hidden'));
+                    });
+                    answerContent && (answerContent.innerHTML = html || '<div class="text-sm text-slate-500">Tidak ada jawaban.</div>');
+                    answerModal.classList.remove('hidden');
+                } catch (e) { console.error(e); alert('Gagal memuat jawaban.'); }
+            });
+            closeAnswerModal && closeAnswerModal.addEventListener('click', () => answerModal.classList.add('hidden'));
 
-        /* ========= edit status (open modal) ========= */
-        document.addEventListener('click', e => {
-            if (!e.target.classList.contains('edit-status-btn')) return;
-            // in table we used item.id as scores.id; pass that to API
-            editingUserId = e.target.dataset.id;
-            const currentStatus = e.target.dataset.status || '-';
-            const manualOverride = e.target.dataset.manualOverride;
-            newStatus.value = currentStatus === 'TIDAK LOLOS' ? 'TIDAK LOLOS' : 'LULUS';
-            statusModalName.textContent = `Status saat ini: ${currentStatus}`;
-            statusModal.classList.remove('hidden');
-            if (manualOverride == 'YES') autoStatus.classList.remove('hidden')
-            else autoStatus.classList.add('hidden')
-        });
-
-        cancelStatusBtn.addEventListener('click', () => statusModal.classList.add('hidden'));
-
-        confirmStatusBtn.addEventListener('click', async () => {
-            const selectedStatus = newStatus.value;
-            // hide status modal first, small delay to allow DOM update so confirm modal is on top
-            statusModal.classList.add('hidden');
-            await new Promise(r => setTimeout(r, 150));
-
-            const ok = await showConfirm(`Ubah status peserta menjadi ${selectedStatus}?`);
-            if (!ok) return;
-
-            try {
-                const res = await fetch('api/update_status.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingUserId, status: selectedStatus }) });
-                const data = await res.json();
-                if (data.success) { alert('Status berhasil diperbarui.'); await loadData(currentPage); }
-                else alert(data.message || 'Gagal memperbarui status.');
-            } catch (e) { console.error(e); alert('Terjadi kesalahan.'); }
-        });
-
-        autoStatus.addEventListener('click', async () => {
-            statusModal.classList.add('hidden');
-            await new Promise(r => setTimeout(r, 150));
-
-            const ok = await showConfirm(`Ubah status menjadi otomatis?`)
-            if (!ok) return;
-
-            try {
-                const res = await fetch('api/update_auto_status.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingUserId }) });
-                const data = await res.json();
-                if (data.success) { alert('Status berhasil diperbarui.'); await fetch('api/update_ranking.php'); await loadData(currentPage); }
-                else alert(data.message || 'Gagal memperbarui status.');
-            } catch (e) { console.error(e); alert('Terjadi kesalahan.'); }
-        });
-
-        /* ========= small util ========= */
-        function escapeHtml(s) {
-            if (s === null || s === undefined) return '';
-            return String(s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]; });
-        }
-
-        document.getElementById("sendEmailAllBtn").addEventListener("click", async () => {
-            const ok = await showConfirm("Kirim email ke SEMUA peserta yang LULUS?");
-            if (!ok) return;
-
-            const res = await fetch("api/send_email.php");
-            const data = await res.json();
-
-            alert(data.message);
-        });
-
-        document.addEventListener("click", async (e) => {
-            if (!e.target.classList.contains("send-email-btn")) return;
-
-            const id = e.target.dataset.id;
-
-            const ok = await showConfirm("Kirim email ke peserta ini?");
-            if (!ok) return;
-
-            const res = await fetch("api/send_email_single.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: id })
+            /* ========= edit status (open modal) ========= */
+            document.addEventListener('click', e => {
+                if (!e.target.classList.contains('edit-status-btn')) return;
+                // in table we used item.id as scores.id; pass that to API
+                editingUserId = e.target.dataset.id;
+                const currentStatus = e.target.dataset.status || '-';
+                const manualOverride = e.target.dataset.manualOverride;
+                newStatus.value = currentStatus === 'TIDAK LOLOS' ? 'TIDAK LOLOS' : 'LULUS';
+                statusModalName.textContent = `Status saat ini: ${currentStatus}`;
+                statusModal.classList.remove('hidden');
+                if (manualOverride == 'YES') autoStatus.classList.remove('hidden')
+                else autoStatus.classList.add('hidden')
             });
 
-            const data = await res.json();
-            alert(data.message);
-        });
+            cancelStatusBtn.addEventListener('click', () => statusModal.classList.add('hidden'));
 
-    </script>
+            confirmStatusBtn.addEventListener('click', async () => {
+                const selectedStatus = newStatus.value;
+                // hide status modal first, small delay to allow DOM update so confirm modal is on top
+                statusModal.classList.add('hidden');
+                await new Promise(r => setTimeout(r, 150));
+
+                const ok = await showConfirm(`Ubah status peserta menjadi ${selectedStatus}?`);
+                if (!ok) return;
+
+                try {
+                    const res = await fetch('api/update_status.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingUserId, status: selectedStatus }) });
+                    const data = await res.json();
+                    if (data.success) { alert('Status berhasil diperbarui.'); await loadData(currentPage); }
+                    else alert(data.message || 'Gagal memperbarui status.');
+                } catch (e) { console.error(e); alert('Terjadi kesalahan.'); }
+            });
+
+            autoStatus.addEventListener('click', async () => {
+                statusModal.classList.add('hidden');
+                await new Promise(r => setTimeout(r, 150));
+
+                const ok = await showConfirm(`Ubah status menjadi otomatis?`)
+                if (!ok) return;
+
+                try {
+                    const res = await fetch('api/update_auto_status.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingUserId }) });
+                    const data = await res.json();
+                    if (data.success) { alert('Status berhasil diperbarui.'); await fetch('api/update_ranking.php'); await loadData(currentPage); }
+                    else alert(data.message || 'Gagal memperbarui status.');
+                } catch (e) { console.error(e); alert('Terjadi kesalahan.'); }
+            });
+
+            /* ========= small util ========= */
+            function escapeHtml(s) {
+                if (s === null || s === undefined) return '';
+                return String(s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]; });
+            }
+
+            document.getElementById("sendEmailAllBtn").addEventListener("click", async () => {
+                const ok = await showConfirm("Kirim email ke SEMUA peserta yang LULUS?");
+                if (!ok) return;
+
+                const res = await fetch("api/send_email.php");
+                const data = await res.json();
+
+                alert(data.message);
+            });
+
+            document.addEventListener("click", async (e) => {
+                if (!e.target.classList.contains("send-email-btn")) return;
+
+                const id = e.target.dataset.id;
+
+                const ok = await showConfirm("Kirim email ke peserta ini?");
+                if (!ok) return;
+
+                const res = await fetch("api/send_email_single.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: id })
+                });
+
+                const data = await res.json();
+                alert(data.message);
+            });
+
+        </script>
 </body>
 
 </html>

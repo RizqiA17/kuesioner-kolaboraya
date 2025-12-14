@@ -272,18 +272,6 @@ INSERT INTO settings (name, value) VALUES ('class_size', '40');
 INSERT INTO settings (name, value) VALUES ('quota', '150');
 INSERT INTO settings (name, value) VALUES ('open_questions', '1');
 
-CREATE TABLE IF NOT EXISTS address(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    normalize_address TEXT NOT NULL,
-    token TEXT NOT NULL,
-    province VARCHAR(255) NOT NULL,
-    regency VARCHAR(255) NOT NULL,
-    district VARCHAR(255) NOT NULL,
-    village VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-)
-
 -- ===========================================================
 -- 8. DATA LOKASI
 -- ===========================================================
@@ -315,7 +303,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `provincies` (
   `code` int NOT NULL,
-  `wilayah` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -324,7 +312,7 @@ CREATE TABLE `provincies` (
 -- Dumping data for table `provincies`
 --
 
-INSERT INTO `provincies` (`code`, `wilayah`, `created_at`, `updated_at`) VALUES
+INSERT INTO `provincies` (`code`, `name`, `created_at`, `updated_at`) VALUES
 (11, 'ACEH', NULL, NULL),
 (12, 'SUMATERA UTARA', NULL, NULL),
 (13, 'SUMATERA BARAT', NULL, NULL),
@@ -363,22 +351,22 @@ INSERT INTO `provincies` (`code`, `wilayah`, `created_at`, `updated_at`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `regancies`
+-- Table structure for table `regencies`
 --
 
-CREATE TABLE `regancies` (
+CREATE TABLE `regencies` (
   `code` int NOT NULL,
-  `wilayah` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `province_code` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `regancies`
+-- Dumping data for table `regencies`
 --
 
-INSERT INTO `regancies` (`code`, `wilayah`, `province_code`, `created_at`, `updated_at`) VALUES
+INSERT INTO `regencies` (`code`, `name`, `province_code`, `created_at`, `updated_at`) VALUES
 (1101, 'KAB. ACEH SELATAN', 11, NULL, NULL),
 (1102, 'KAB. ACEH TENGGARA', 11, NULL, NULL),
 (1103, 'KAB. ACEH TIMUR', 11, NULL, NULL),
@@ -902,7 +890,7 @@ INSERT INTO `regancies` (`code`, `wilayah`, `province_code`, `created_at`, `upda
 
 CREATE TABLE `districts` (
   `code` int NOT NULL,
-  `wilayah` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `regency_code` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -912,7 +900,7 @@ CREATE TABLE `districts` (
 -- Dumping data for table `districts`
 --
 
-INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updated_at`) VALUES
+INSERT INTO `districts` (`code`, `name`, `regency_code`, `created_at`, `updated_at`) VALUES
 (110101, 'Bakongan', 1101, NULL, NULL),
 (110102, 'Kluet Utara', 1101, NULL, NULL),
 (110103, 'Kluet Selatan', 1101, NULL, NULL),
@@ -1259,9 +1247,9 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (120420, 'Hiliserangkai', 1204, NULL, NULL),
 (120421, 'Botomuzoi', 1204, NULL, NULL),
 (120427, 'Ulugawo', 1204, NULL, NULL),
-(120428, 'Ma\'u', 1204, NULL, NULL),
+(120428, "Ma'u", 1204, NULL, NULL),
 (120429, 'Somolo-molo', 1204, NULL, NULL),
-(120435, 'Sogae\'adu', 1204, NULL, NULL),
+(120435, "Sogae'adu", 1204, NULL, NULL),
 (120501, 'Bahorok', 1205, NULL, NULL),
 (120502, 'Salapian', 1205, NULL, NULL),
 (120503, 'Kuala', 1205, NULL, NULL),
@@ -1464,11 +1452,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (121418, 'Fanayama', 1214, NULL, NULL),
 (121419, 'Ulunoyo', 1214, NULL, NULL),
 (121420, 'Huruna', 1214, NULL, NULL),
-(121421, 'O\'o\'u', 1214, NULL, NULL),
-(121422, 'Onohazumba', 1214, NULL, NULL),
-(121423, 'Hilisalawa\'ahe', 1214, NULL, NULL),
-(121424, 'Ulususua', 1214, NULL, NULL),
-(121425, 'Sidua\'ori', 1214, NULL, NULL),
+(121425, "Sidua'ori", 1214, NULL, NULL),
 (121426, 'Somambawa', 1214, NULL, NULL),
 (121427, 'Boronadu', 1214, NULL, NULL),
 (121428, 'Simuk', 1214, NULL, NULL),
@@ -1586,11 +1570,11 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (122501, 'Lahomi', 1225, NULL, NULL),
 (122502, 'Sirombu', 1225, NULL, NULL),
 (122503, 'Mandrehe Barat', 1225, NULL, NULL),
-(122504, 'Moro\'o', 1225, NULL, NULL),
+(122504, "Moro'o", 1225, NULL, NULL),
 (122505, 'Mandrehe', 1225, NULL, NULL),
 (122506, 'Mandrehe Utara', 1225, NULL, NULL),
 (122507, 'Lolofitu Moi', 1225, NULL, NULL),
-(122508, 'Ulu Moro\'o', 1225, NULL, NULL),
+(122508, "Ulu Moro'o", 1225, NULL, NULL),
 (127101, 'Medan Kota', 1271, NULL, NULL),
 (127102, 'Medan Sunggal', 1271, NULL, NULL),
 (127103, 'Medan Helvetia', 1271, NULL, NULL),
@@ -2126,7 +2110,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (157102, 'Jambi Selatan', 1571, NULL, NULL),
 (157103, 'Jambi Timur', 1571, NULL, NULL),
 (157104, 'Pasar Jambi', 1571, NULL, NULL);
-INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updated_at`) VALUES
+INSERT INTO `districts` (`code`, `name`, `regency_code`, `created_at`, `updated_at`) VALUES
 (157105, 'Pelayangan', 1571, NULL, NULL),
 (157106, 'Danau Teluk', 1571, NULL, NULL),
 (157107, 'Kota Baru', 1571, NULL, NULL),
@@ -3365,7 +3349,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (321414, 'Cibatu', 3214, NULL, NULL),
 (321415, 'Sukasari', 3214, NULL, NULL),
 (321416, 'Pondoksalam', 3214, NULL, NULL);
-INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updated_at`) VALUES
+INSERT INTO `districts` (`code`, `name`, `regency_code`, `created_at`, `updated_at`) VALUES
 (321417, 'Kiarapedes', 3214, NULL, NULL),
 (321501, 'Karawang Barat', 3215, NULL, NULL),
 (321502, 'Pangkalan', 3215, NULL, NULL),
@@ -4675,7 +4659,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (352316, 'Tuban', 3523, NULL, NULL),
 (352317, 'Plumpang', 3523, NULL, NULL);
 
-INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updated_at`) VALUES
+INSERT INTO `districts` (`code`, `name`, `regency_code`, `created_at`, `updated_at`) VALUES
 (352318, 'Palang', 3523, NULL, NULL),
 (352319, 'Widang', 3523, NULL, NULL),
 (352320, 'Grabagan', 3523, NULL, NULL),
@@ -5137,7 +5121,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (520429, 'Lantung', 5204, NULL, NULL),
 (520501, 'Dompu', 5205, NULL, NULL),
 (520502, 'Kempo', 5205, NULL, NULL),
-(520503, 'Hu\'u', 5205, NULL, NULL),
+(520503, "Hu'u", 5205, NULL, NULL),
 (520504, 'Kilo', 5205, NULL, NULL),
 (520505, 'Woja', 5205, NULL, NULL),
 (520506, 'Pekat', 5205, NULL, NULL),
@@ -5218,7 +5202,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (530207, 'Amanuban Barat', 5302, NULL, NULL),
 (530208, 'Amanatun Selatan', 5302, NULL, NULL),
 (530209, 'Amanatun Utara', 5302, NULL, NULL),
-(530210, 'KI\'E', 5302, NULL, NULL),
+(530210, "KI'E", 5302, NULL, NULL),
 (530211, 'Kuanfatu', 5302, NULL, NULL),
 (530212, 'Fatumnasi', 5302, NULL, NULL),
 (530213, 'Polen', 5302, NULL, NULL),
@@ -5943,7 +5927,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (631102, 'Halong', 6311, NULL, NULL),
 (631103, 'Awayan', 6311, NULL, NULL),
 (631104, 'Batu Mandi', 6311, NULL, NULL);
-INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updated_at`) VALUES
+INSERT INTO `districts` (`code`, `name`, `regency_code`, `created_at`, `updated_at`) VALUES
 (631105, 'Lampihong', 6311, NULL, NULL),
 (631106, 'Paringin', 6311, NULL, NULL),
 (631107, 'Paringin Selatan', 6311, NULL, NULL),
@@ -6727,13 +6711,13 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (732603, 'Nanggala', 7326, NULL, NULL),
 (732604, 'Rindingallo', 7326, NULL, NULL),
 (732605, 'Buntao', 7326, NULL, NULL),
-(732606, 'Sa\'dan', 7326, NULL, NULL),
+(732606, "Sa'dan", 7326, NULL, NULL),
 (732607, 'Sanggalangi', 7326, NULL, NULL),
 (732608, 'Sopai', 7326, NULL, NULL),
 (732609, 'Tikala', 7326, NULL, NULL),
 (732610, 'Balusu', 7326, NULL, NULL),
 (732611, 'Tallunglipu', 7326, NULL, NULL),
-(732612, 'Dende\' Piongan Napo', 7326, NULL, NULL),
+(732612, "Dende' Piongan Napo", 7326, NULL, NULL),
 (732613, 'Buntu Pepasan', 7326, NULL, NULL),
 (732614, 'Baruppu', 7326, NULL, NULL),
 (732615, 'Kesu', 7326, NULL, NULL),
@@ -7199,7 +7183,7 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 (810512, 'Bula Barat', 8105, NULL, NULL),
 (810513, 'Kian Darat', 8105, NULL, NULL),
 (810514, 'Siritaun Wida Timur', 8105, NULL, NULL);
-INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updated_at`) VALUES
+INSERT INTO `districts` (`code`, `name`, `regency_code`, `created_at`, `updated_at`) VALUES
 (810515, 'Teluk Waru', 8105, NULL, NULL),
 (810601, 'Kairatu', 8106, NULL, NULL),
 (810602, 'Seram Barat', 8106, NULL, NULL),
@@ -8153,11 +8137,11 @@ INSERT INTO `districts` (`code`, `wilayah`, `regency_code`, `created_at`, `updat
 -- --------------------------------------------------------
 
 --
--- Indexes for table `regancies`
+-- Indexes for table `regencies`
 --
-ALTER TABLE `regancies`
+ALTER TABLE `regencies`
   ADD PRIMARY KEY (`code`),
-  ADD KEY `regancies_province_code_foreign` (`province_code`);
+  ADD KEY `regencies_province_code_foreign` (`province_code`);
 
 --
 -- Indexes for table `districts`
@@ -8176,23 +8160,40 @@ ALTER TABLE `provincies`
 --
 
 --
--- Constraints for table `regancies`
+-- Constraints for table `regencies`
 --
-ALTER TABLE `regancies`
-  ADD CONSTRAINT `regancies_province_code_foreign` FOREIGN KEY (`province_code`) REFERENCES `provincies` (`code`);
+ALTER TABLE `regencies`
+  ADD CONSTRAINT `regencies_province_code_foreign` FOREIGN KEY (`province_code`) REFERENCES `provincies` (`code`);
 
 --
 -- Constraints for table `districts`
 --
 ALTER TABLE `districts`
-  ADD CONSTRAINT `districts_regency_code_foreign` FOREIGN KEY (`regency_code`) REFERENCES `regancies` (`code`);
+  ADD CONSTRAINT `districts_regency_code_foreign` FOREIGN KEY (`regency_code`) REFERENCES `regencies` (`code`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
+-- ===========================================================
+-- 9. TABLE ADDRESS
+-- ===========================================================
 
+CREATE TABLE IF NOT EXISTS address(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    province_code INT NULL,
+    regency_code INT NULL,
+    district_code INT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (province_code) REFERENCES provincies(code),
+    FOREIGN KEY (regency_code) REFERENCES regencies(code),
+    FOREIGN KEY (district_code) REFERENCES districts(code)
+);
+
+ALTER TABLE address
+ADD UNIQUE KEY uniq_user (user_id);
 
 -- ===========================================================
 -- END OF FILE

@@ -9,13 +9,24 @@ $name = trim($data['name']);
 $email = trim($data['email']);
 $phone = trim($data['phone']);
 $organization = trim($data['organization']);
+$provinsi = trim($data['provinsi']);
+$regency = trim($data['kabupaten_kota']);
 $office_address = trim($data['office_address']);
 
 $answers = $data['answers'] ?? [];
 
+$stmt = $pdo->prepare("SELECT p.name as prov, r.name as regency FROM regencies AS r JOIN provincies AS p ON p.code = r.province_code WHERE r.code = :code");
+$stmt->execute([":code" => $regency]);
+$addressData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$provinsi = ucwords(strtolower($addressData[0]['prov']));
+$regency = ucwords(strtolower($addressData[0]['regency']));
+
+$address = "{$office_address}, {$regency}, Prov. {$provinsi}";
+
 // === Simpan User ===
 $stmt = $pdo->prepare("INSERT INTO users (name, email, phone, organization, office_address) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), phone = VALUES(phone), organization = VALUES(organization), office_address = VALUES(office_address)");
-$stmt->execute([$name, $email, $phone, $organization, $office_address]);
+$stmt->execute([$name, $email, $phone, $organization, $address]);
 $userId = $pdo->lastInsertId();
 if (!$userId) {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");

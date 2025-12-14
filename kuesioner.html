@@ -65,9 +65,19 @@
 
             <div>
                 <label class="block mb-1 font-medium text-gray-700">Alamat Kantor</label>
-                <textarea name="office_address" conte
+                <select name="provinsi"
+                    class=" mb-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    id="provinsi">
+                    <option value="" selected>- Pilih Provinsi -</option>
+                </select>
+                <select name="kabupaten_kota" disabled
+                    class=" mb-2 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    id="kabupaten_kota">
+                    <option value="" selected>- Pilih Kabupaten / Kota -</option>
+                </select>
+
+                <textarea name="office_address" placeholder="Masukan alamat tambahan"
                     class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
-                <p class="mt-1 text-sm text-gray-500">*isi strip (-) jika tidak ada</p>
             </div>
 
             <div id="questionList">
@@ -86,9 +96,17 @@
 
     <script>
         const submitBtn = document.getElementById('submitBtn');
+        const provSelect = document.getElementById('provinsi');
+        const kabSelect = document.getElementById('kabupaten_kota');
+        const form = document.getElementById('kuesionerForm');
 
-        // === Ambil Pertanyaan dari Database ===
+        // === Ambil Pertanyaan dan Provinsi dari Database ===
         document.addEventListener("DOMContentLoaded", async () => {
+            getQuestion()
+            getProvinces()
+        });
+
+        async function getQuestion(params) {
             const container = document.getElementById("questionList");
 
             try {
@@ -121,10 +139,42 @@
             } catch (e) {
                 container.innerHTML = '<p class="text-center text-red-600">Gagal memuat pertanyaan.</p>';
             }
+        }
+
+        async function getProvinces() {
+            try {
+                const res = await fetch('/api/get_provincies.php');
+                const result = await res.json();
+
+                provSelect.innerHTML = '<option value="" disabled selected>- Pilih Provinsi -</option>';
+                result.data.forEach(prov => {
+                    provSelect.innerHTML += `<option value="${prov.code}">${prov.name}</option>`;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        provSelect.addEventListener('change', async (e) => {
+            const provCode = e.target.value;
+            
+            try {
+                const res = await fetch(`/api/get_regencies.php?prov=${provCode}`);
+                const result = await res.json();
+
+                kabSelect.innerHTML = '<option value="" disabled selected>- Pilih Kabupaten / Kota -</option>';
+                result.data.forEach(regency => {
+                    kabSelect.innerHTML += `<option value="${regency.code}">${regency.name}</option>`;
+                });
+
+                kabSelect.disabled = false;
+            } catch (e) {
+                console.error(e);
+            }
         });
 
         // === Submit Jawaban ===
-        document.getElementById('kuesionerForm').addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             submitBtn.disabled = true;
@@ -142,6 +192,8 @@
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 organization: formData.get('organization'),
+                provinsi: formData.get('provinsi'),
+                kabupaten_kota: formData.get('kabupaten_kota'),
                 office_address: formData.get('office_address'),
                 answers: answers
             };
@@ -171,7 +223,7 @@
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Kirim Jawaban';
             }
-        });
+        });        
     </script>
 </body>
 
