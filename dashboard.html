@@ -597,7 +597,7 @@
                     batchList.appendChild(btn);
                 }
 
-                for (let i = 0; i <= data[0].moreBatch; i++) {
+                for (let i = 0; i < data[0].moreBatch; i++) {
                     const btn = document.createElement("button");
                     btn.className =
                         "px-4 py-2 rounded-md border-none shadow-md text-slate-50 bg-blue-500 hover:bg-blue-600 transition-all";
@@ -667,7 +667,7 @@
                     }
 
                     if (limitPerCsv.value !== '') {
-                        url += '&limit_per_csv=' + encodeURIComponent(limitPerCsv.value);
+                        url += '&limit_per_xlsx=' + encodeURIComponent(limitPerCsv.value);
                     }
 
                     window.location.href = url;

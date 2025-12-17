@@ -1,5 +1,11 @@
 <?php
-require_once __DIR__ . "/db.php";
+require_once "db.php";
+require_once "../vendor/autoload.php";
+
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 session_start();
 
 // Pastikan hanya fasilitator yang boleh download
@@ -8,25 +14,30 @@ if (!isset($_SESSION['facilitator_id'])) {
     exit("Akses ditolak");
 }
 
-header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename=semua_peserta.csv');
+$spreadsheet = new Spreadsheet();
+$sheet = $spreadsheet->getActiveSheet();
+$sheet->setTitle('Semua Peserta');
 
-$output = fopen('php://output', 'w');
-
-// Header CSV
-fputcsv($output, [
+// Header kolom
+$headers = [
     'Ranking',
     'Nama',
     'Email',
-    'Phone',
-    'Organization',
-    'Office Address',
-    'Core Score',
-    'Integrity Status',
-    'Final Status'
-], '|');
+    'No HP',
+    'Organisasi',
+    'Alamat',
+    'Skor',
+    'Integritas',
+    'Status'
+];
 
-// Query dengan PDO
+$col = 'A';
+foreach ($headers as $header) {
+    $sheet->setCellValue($col . '1', $header);
+    $col++;
+}
+
+// Query data
 $stmt = $pdo->query("
     SELECT 
         s.ranking,
@@ -47,7 +58,8 @@ $stmt = $pdo->query("
         s.ranking ASC
 ");
 
-// Output baris CSV
+$rowNumber = 2;
+
 while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
     // Final status
@@ -55,21 +67,32 @@ while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
         ? $r['manual_status']
         : $r['status'];
 
-    // Hapus newline di alamat sebelum masuk CSV
+    // Bersihkan newline di alamat
     $cleanAddress = str_replace(["\r", "\n"], ' ', $r['office_address']);
 
-    fputcsv($output, [
-        $r['ranking'],
-        $r['name'],
-        $r['email'],
-        $r['phone'],
-        $r['organization'],
-        $cleanAddress,
-        $r['core_score'],
-        $r['integrity_status'],
-        $finalStatus
-    ], '|');
+    $sheet->setCellValue('A' . $rowNumber, $r['ranking']);
+    $sheet->setCellValue('B' . $rowNumber, $r['name']);
+    $sheet->setCellValue('C' . $rowNumber, $r['email']);
+    $sheet->setCellValueExplicit('D' . $rowNumber,$r['phone'],DataType::TYPE_STRING);
+    $sheet->setCellValue('E' . $rowNumber, $r['organization']);
+    $sheet->setCellValue('F' . $rowNumber, $cleanAddress);
+    $sheet->setCellValue('G' . $rowNumber, $r['core_score']);
+    $sheet->setCellValue('H' . $rowNumber, $r['integrity_status']);
+    $sheet->setCellValue('I' . $rowNumber, $finalStatus);
+
+    $rowNumber++;
 }
 
-fclose($output);
+// Auto width kolom
+foreach (range('A', 'I') as $columnID) {
+    $sheet->getColumnDimension($columnID)->setAutoSize(true);
+}
+
+// Header download
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Content-Disposition: attachment; filename="semua_peserta.xlsx"');
+header('Cache-Control: max-age=0');
+
+$writer = new Xlsx($spreadsheet);
+$writer->save('php://output');
 exit;

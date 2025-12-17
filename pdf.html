@@ -131,7 +131,6 @@
             const { jsPDF } = window.jspdf;
 
             const doc = new jsPDF({
-                orientation: "landscape",  // supaya melebar seperti print
                 unit: "pt",
                 format: "A4"
             });
@@ -152,9 +151,9 @@
 
             doc.autoTable({
                 head: [[
-                    "No", "Name", "Email", "Phone",
-                    "Organization", "Core Score",
-                    "Integrity", "Status"
+                    "No", "Nama", "Email", "No HP",
+                    "Organisasi", "Skor",
+                    "Integritas", "Status"
                 ]],
                 body: rows,
                 startY: 50,

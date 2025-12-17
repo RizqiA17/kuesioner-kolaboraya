@@ -3,7 +3,17 @@
 ob_start();
 
 require_once 'db.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+
+/*
+|--------------------------------------------------
+| TOKEN
+|--------------------------------------------------
+*/
 if (empty($_GET['token'])) {
     http_response_code(401);
     exit;
@@ -16,11 +26,7 @@ $stmt = $pdo->prepare("
         AND expires_at > NOW()
     LIMIT 1
 ");
-
-$stmt->execute([
-    ':token' => $_GET['token']
-]);
-
+$stmt->execute([':token' => $_GET['token']]);
 $tokenRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$tokenRow) {
@@ -33,7 +39,7 @@ $pdo->prepare("DELETE FROM tokens WHERE id = :id")
 
 /*
 |--------------------------------------------------
-| Query utama
+| QUERY UTAMA (TIDAK DIUBAH)
 |--------------------------------------------------
 */
 $query = "
@@ -59,14 +65,12 @@ $wilayahLabel = 'Semua_Wilayah';
 
 /*
 |--------------------------------------------------
-| Wilayah
+| WILAYAH (TIDAK DIUBAH)
 |--------------------------------------------------
 */
 if (!isset($_GET['provinsi'])) {
     echo json_encode(['status' => false, 'message' => 'Tidak ada wilayah yang dipilih']);
-
     ob_end_flush();
-
     exit;
 }
 
@@ -103,69 +107,95 @@ $query .= " ORDER BY s.ranking ASC";
 
 /*
 |--------------------------------------------------
-| Batch config
+| BATCH CONFIG (TIDAK DIUBAH)
 |--------------------------------------------------
 */
-$limitPerCsv = isset($_GET['limit_per_csv']) && (int) $_GET['limit_per_csv'] > 0
-    ? (int) $_GET['limit_per_csv']
+$limitPerXlsx = isset($_GET['limit_per_xlsx']) && (int) $_GET['limit_per_xlsx'] > 0
+    ? (int) $_GET['limit_per_xlsx']
     : null;
 
 /*
 |--------------------------------------------------
-| SINGLE CSV
+| HELPER: BUILD XLSX DARI PDOStatement
 |--------------------------------------------------
 */
-if ($limitPerCsv === null) {
+function buildXlsx(PDOStatement $stmt, string $filename)
+{
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
 
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename="peserta_' . $wilayahLabel . '.csv"');
-
-    $out = fopen('php://output', 'w');
-
-    fputcsv($out, [
+    $headers = [
         'Ranking',
         'Nama',
         'Email',
-        'Phone',
-        'Organization',
-        'Office Address',
-        'Core Score',
-        'Integrity Status',
-        'Final Status'
-    ], '|');
+        'No HP',
+        'Organisasi',
+        'Alamat',
+        'Skor',
+        'Integritas',
+        'Status'
+    ];
 
-    $stmt = $pdo->prepare($query);
-    $stmt->execute($params);
+    $col = 'A';
+    foreach ($headers as $h) {
+        $sheet->setCellValue($col . '1', $h);
+        $col++;
+    }
 
+    $rowNum = 2;
     while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
         $finalStatus = $r['manual_override'] === 'YES'
             ? $r['manual_status']
             : $r['status'];
 
-        fputcsv($out, [
-            $r['ranking'],
-            $r['name'],
-            $r['email'],
+        $sheet->setCellValue('A' . $rowNum, $r['ranking']);
+        $sheet->setCellValue('B' . $rowNum, $r['name']);
+        $sheet->setCellValue('C' . $rowNum, $r['email']);
+
+        // PHONE AS TEXT (AMAN +62)
+        $sheet->setCellValueExplicit(
+            'D' . $rowNum,
             $r['phone'],
-            $r['organization'],
-            str_replace(["\r", "\n"], ' ', $r['office_address']),
-            $r['core_score'],
-            $r['integrity_status'],
-            $finalStatus
-        ], '|');
+            DataType::TYPE_STRING
+        );
+
+        $sheet->setCellValue('E' . $rowNum, $r['organization']);
+        $sheet->setCellValue('F' . $rowNum, str_replace(["\r", "\n"], ' ', $r['office_address']));
+        $sheet->setCellValue('G' . $rowNum, $r['core_score']);
+        $sheet->setCellValue('H' . $rowNum, $r['integrity_status']);
+        $sheet->setCellValue('I' . $rowNum, $finalStatus);
+
+        $rowNum++;
     }
 
-    fclose($out);
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $filename . '.xlsx"');
+    header('Cache-Control: max-age=0');
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
+}
+
+/*
+|--------------------------------------------------
+| SINGLE XLSX
+|--------------------------------------------------
+*/
+if ($limitPerXlsx === null) {
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+
+    buildXlsx($stmt, 'peserta_' . $wilayahLabel);
 
     ob_end_flush();
-
     exit;
 }
 
 /*
 |--------------------------------------------------
-| ZIP export (temp file OS)
+| ZIP XLSX (BATCH)
 |--------------------------------------------------
 */
 $countStmt = $pdo->prepare("SELECT COUNT(*) FROM ({$query}) t");
@@ -178,81 +208,79 @@ unlink($tmpZipPath);
 $zip = new ZipArchive();
 $zip->open($tmpZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-
-for ($offset = 0, $batch = 1; $offset < $totalRows; $offset += $limitPerCsv, $batch++) {
-
-    $csvStream = fopen('php://temp/maxmemory:5242880', 'w+');
-
-    fputcsv($csvStream, [
-        'Ranking',
-        'Nama',
-        'Email',
-        'Phone',
-        'Organization',
-        'Office Address',
-        'Core Score',
-        'Integrity Status',
-        'Final Status'
-    ], '|');
+for ($offset = 0, $batch = 1; $offset < $totalRows; $offset += $limitPerXlsx, $batch++) {
 
     $stmt = $pdo->prepare($query . " LIMIT :limit OFFSET :offset");
 
     foreach ($params as $k => $v) {
         $stmt->bindValue($k, $v);
     }
-
-    $stmt->bindValue(':limit', $limitPerCsv, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', $limitPerXlsx, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
     $stmt->execute();
 
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    $headers = [
+        'Ranking',
+        'Nama',
+        'Email',
+        'No HP',
+        'Organisasi',
+        'Alamat',
+        'Skor',
+        'Integritas',
+        'Status'
+    ];
+
+    $col = 'A';
+    foreach ($headers as $h) {
+        $sheet->setCellValue($col . '1', $h);
+        $col++;
+    }
+
+    $rowNum = 2;
     while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
         $finalStatus = $r['manual_override'] === 'YES'
             ? $r['manual_status']
             : $r['status'];
 
-        fputcsv($csvStream, [
-            $r['ranking'],
-            $r['name'],
-            $r['email'],
-            $r['phone'],
-            $r['organization'],
-            str_replace(["\r", "\n"], ' ', $r['office_address']),
-            $r['core_score'],
-            $r['integrity_status'],
-            $finalStatus
-        ], '|');
+        $sheet->setCellValue('A' . $rowNum, $r['ranking']);
+        $sheet->setCellValue('B' . $rowNum, $r['name']);
+        $sheet->setCellValue('C' . $rowNum, $r['email']);
+        $sheet->setCellValueExplicit('D' . $rowNum, $r['phone'], DataType::TYPE_STRING);
+        $sheet->setCellValue('E' . $rowNum, $r['organization']);
+        $sheet->setCellValue('F' . $rowNum, str_replace(["\r", "\n"], ' ', $r['office_address']));
+        $sheet->setCellValue('G' . $rowNum, $r['core_score']);
+        $sheet->setCellValue('H' . $rowNum, $r['integrity_status']);
+        $sheet->setCellValue('I' . $rowNum, $finalStatus);
+
+        $rowNum++;
     }
 
-    rewind($csvStream);
+    $tmpXlsx = tempnam(sys_get_temp_dir(), 'xlsx_');
+    $writer = new Xlsx($spreadsheet);
+    $writer->save($tmpXlsx);
 
-    $zip->addFromString(
-        'peserta_' . $wilayahLabel . '_' . $batch . '.csv',
-        stream_get_contents($csvStream)
-    );
-
-    fclose($csvStream);
+    $zip->addFile($tmpXlsx, 'peserta_' . $wilayahLabel . '_' . $batch . '.xlsx');
 }
 
 $zip->close();
 
 /*
 |--------------------------------------------------
-| Stream ZIP ke client
+| STREAM ZIP
 |--------------------------------------------------
 */
 header('Content-Type: application/zip');
 header('Content-Disposition: attachment; filename="peserta_' . $wilayahLabel . '.zip"');
 header('Content-Length: ' . filesize($tmpZipPath));
-header('Content-Transfer-Encoding: binary');
-header('X-Content-Type-Options: nosniff');
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Pragma: no-cache');
-
 
 readfile($tmpZipPath);
 unlink($tmpZipPath);
 
 ob_end_flush();
-
 exit;

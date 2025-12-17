@@ -1,27 +1,39 @@
 <?php
 require_once 'db.php';
+require_once "./../vendor/autoload.php";
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+
 session_start();
 
 // Hanya fasilitator
 if (!isset($_SESSION['facilitator_id'])) {
     http_response_code(401);
-    echo "Unauthorized";
-    exit;
+    exit("Unauthorized");
 }
 
-// Ambil nomor batch dari URL
+// Ambil nomor batch
 $batchNumber = isset($_GET['batch']) ? intval($_GET['batch']) : 1;
-if ($batchNumber < 1) $batchNumber = 1;
+if ($batchNumber < 1) {
+    $batchNumber = 1;
+}
 
-// Ambil limit dari settings
-$settingStmt = $pdo->prepare("SELECT value FROM settings WHERE name = 'class_size' LIMIT 1");
+// Ambil class_size dari settings
+$settingStmt = $pdo->prepare("
+    SELECT value 
+    FROM settings 
+    WHERE name = 'class_size' 
+    LIMIT 1
+");
 $settingStmt->execute();
 $classSize = (int) $settingStmt->fetchColumn();
 
 // Hitung offset
 $offset = ($batchNumber - 1) * $classSize;
 
-// Ambil data (lulus atau gagal tapi nilai di atas minimum)
+// Query data
 $stmt = $pdo->prepare("
     SELECT 
         s.ranking,
@@ -43,58 +55,76 @@ $stmt = $pdo->prepare("
 
 $stmt->bindValue(':limit', $classSize, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-
 $stmt->execute();
 
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Buat spreadsheet
+$spreadsheet = new Spreadsheet();
+$sheet = $spreadsheet->getActiveSheet();
+$sheet->setTitle('Kelas ' . $batchNumber);
 
-// Set headers CSV
-header('Content-Type: text/csv');
-header('Content-Disposition: attachment; filename="kelas_' . $batchNumber . '.csv"');
-
-$output = fopen('php://output', 'w');
-
-// Header CSV
-fputcsv($output, [
+// Header kolom
+$headers = [
     'Ranking',
     'Nama',
     'Email',
-    'Phone',
-    'Organization',
-    'Office Address',
-    'Core Score',
-    'Integrity Status',
-    'Final Status'
-], '|');
+    'No HP',
+    'Organisasi',
+    'Alamat',
+    'Skor',
+    'Integritas',
+    'Status'
+];
 
+$col = 'A';
+foreach ($headers as $header) {
+    $sheet->setCellValue($col . '1', $header);
+    $col++;
+}
 
-// Output data
+// Isi data
+$rowNumber = 2;
+
 foreach ($rows as $r) {
 
-    // Tentukan final status
     $finalStatus = ($r['manual_override'] === "YES")
         ? $r['manual_status']
         : $r['status'];
 
-    // Bersihkan newline pada alamat agar tidak pecah baris
     $cleanAddress = preg_replace('/\s+/', ' ', trim($r['office_address']));
 
-    // Tulis ke CSV
-    fputcsv($output, [
-        $r['ranking'],
-        $r['name'],
-        $r['email'],
+    $sheet->setCellValue('A' . $rowNumber, $r['ranking']);
+    $sheet->setCellValue('B' . $rowNumber, $r['name']);
+    $sheet->setCellValue('C' . $rowNumber, $r['email']);
+
+    $sheet->setCellValueExplicit(
+        'D' . $rowNumber,
         $r['phone'],
-        $r['organization'],
-        $cleanAddress,
-        $r['core_score'],
-        $r['integrity_status'],
-        $finalStatus
-    ], '|');
+        DataType::TYPE_STRING
+    );
+
+    $sheet->setCellValue('E' . $rowNumber, $r['organization']);
+    $sheet->setCellValue('F' . $rowNumber, $cleanAddress);
+    $sheet->setCellValue('G' . $rowNumber, $r['core_score']);
+    $sheet->setCellValue('H' . $rowNumber, $r['integrity_status']);
+    $sheet->setCellValue('I' . $rowNumber, $finalStatus);
+
+    $rowNumber++;
 }
 
-fclose($output);
-exit;
+// Auto width kolom
+foreach (range('A', 'I') as $columnID) {
+    $sheet->getColumnDimension($columnID)->setAutoSize(true);
+}
 
-?>
+// Header download
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header(
+    'Content-Disposition: attachment; filename="kelas_' . $batchNumber . '.xlsx"'
+);
+header('Cache-Control: max-age=0');
+
+$writer = new Xlsx($spreadsheet);
+$writer->save('php://output');
+exit;
